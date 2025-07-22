@@ -16,7 +16,7 @@ using TokenHandler = API.Utilities.Handlers.TokenHandler;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<PosDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<PosDbContext>(option => option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 builder.Services.AddControllers();

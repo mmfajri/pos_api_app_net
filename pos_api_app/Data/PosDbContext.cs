@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using System.Data.Common;
 using API.Model.Entities;
 using API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
