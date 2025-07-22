@@ -1,5 +1,4 @@
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using API.Contracts.Repositories.Entities;
 using API.Contracts.Utilities;
 using API.Data;
@@ -38,8 +37,6 @@ builder.Services.AddScoped<PriceService>();
 builder.Services.AddScoped<TransactionService>();
 
 //Add Fluent Validation Setting
-builder.Services.AddFluentValidationAutoValidation()
-       .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 //Add Service for Token
 builder.Services.AddScoped<ITokenHandler, TokenHandler>();
