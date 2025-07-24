@@ -1,10 +1,10 @@
-﻿using API.Contracts.Utilities;
+﻿using pos_api_app.Contracts.Utilities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace API.Utilities.Handlers;
+namespace pos_api_app.Utilities.Handlers;
 
 public class TokenHandler : ITokenHandler
 {

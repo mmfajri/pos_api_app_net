@@ -1,16 +1,16 @@
-﻿using API.Models;
-using API.Models.Entities;
+﻿using pos_api_app.Models;
+using pos_api_app.Models.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Model.Entities;
+namespace pos_api_app.Model.Entities;
 
 [Table("tb_m_product")]
 public class Product : BaseEntity
 {
-    [Column("barcode_id", TypeName ="nvarchar(255)")]
+    [Column("barcode_id", TypeName ="varchar(255)")]
     public string BarcodeID { get; set; } = string.Empty;
 
-    [Column("title", TypeName ="nvarchar(150)")]
+    [Column("title", TypeName ="varchar(150)")]
     public string Title { get; set; } = string.Empty;
 
     //Cardinality

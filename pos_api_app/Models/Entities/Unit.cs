@@ -1,8 +1,8 @@
-﻿using API.Models;
-using API.Models.Entities;
+﻿using pos_api_app.Models;
+using pos_api_app.Models.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Model.Entities;
+namespace pos_api_app.Model.Entities;
 
 [Table("tb_m_unit")]
 public class Unit : BaseEntity

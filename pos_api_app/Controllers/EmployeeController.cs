@@ -1,14 +1,14 @@
-﻿using API.DTOs.EmployeesDTO;
-using API.DTOs.ProductDTO;
-using API.Services;
-using API.Utilities.Handler;
+﻿using pos_api_app.DTOs.EmployeesDTO;
+using pos_api_app.DTOs.ProductDTO;
+using pos_api_app.Services;
+using pos_api_app.Utilities.Handler;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace API.Controllers;
+namespace pos_api_app.Controllers;
 
 [ApiController]
-[Route("api/[controller]/")]
+[Route("pos_api_app/[controller]/")]
 public class EmployeeController : ControllerBase
 {
     private readonly EmployeeService _employeeService;

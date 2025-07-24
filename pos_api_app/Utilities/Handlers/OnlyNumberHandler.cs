@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace API.Utilities.Handlers;
+namespace pos_api_app.Utilities.Handlers;
 
 public class OnlyNumberHandler<TKey>
 {

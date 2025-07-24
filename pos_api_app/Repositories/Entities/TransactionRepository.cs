@@ -1,9 +1,9 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.Data;
-using API.Model.Entities;
-using API.Models.Entities;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.Data;
+using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 
-namespace API.Repository.Entities;
+namespace pos_api_app.Repository.Entities;
 
 public class TransactionRepository : GeneralRepository<Transaction>, ITransactionRepository
 {

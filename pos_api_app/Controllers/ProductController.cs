@@ -1,14 +1,14 @@
-﻿using API.DTOs.ProductDTO;
-using API.Services;
-using API.Utilities.Handler;
+﻿using pos_api_app.DTOs.ProductDTO;
+using pos_api_app.Services;
+using pos_api_app.Utilities.Handler;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net;
 
-namespace API.Controllers;
+namespace pos_api_app.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("pos_api_app/[controller]")]
 public class ProductController : ControllerBase
 {
     private readonly ProductService _productService;

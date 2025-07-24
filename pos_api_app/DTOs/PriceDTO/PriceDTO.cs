@@ -1,6 +1,6 @@
-﻿using API.Models.Entities;
+﻿using pos_api_app.Models.Entities;
 
-namespace API.DTOs.PriceDTO;
+namespace pos_api_app.DTOs.PriceDTO;
 
 public class PriceDTO
 {

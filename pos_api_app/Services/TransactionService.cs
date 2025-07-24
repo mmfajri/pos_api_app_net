@@ -1,12 +1,12 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.Data;
-using API.DTOs.TransactionsDTO;
-using API.DTOs.TransactionsItemDTO;
-using API.Model.Entities;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.Data;
+using pos_api_app.DTOs.TransactionsDTO;
+using pos_api_app.DTOs.TransactionsItemDTO;
+using pos_api_app.Model.Entities;
 using System.Data;
 using System.Net;
 
-namespace API.Services;
+namespace pos_api_app.Services;
 
 public class TransactionService
 {

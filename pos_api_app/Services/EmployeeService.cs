@@ -1,12 +1,12 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.Data;
-using API.DTOs.EmployeesDTO;
-using API.DTOs.RolesDTO;
-using API.Model.Entities;
-using API.Repository.Entities;
-using API.Utilities.Enums;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.Data;
+using pos_api_app.DTOs.EmployeesDTO;
+using pos_api_app.DTOs.RolesDTO;
+using pos_api_app.Model.Entities;
+using pos_api_app.Repository.Entities;
+using pos_api_app.Utilities.Enums;
 
-namespace API.Services;
+namespace pos_api_app.Services;
 
 public class EmployeeService
 {

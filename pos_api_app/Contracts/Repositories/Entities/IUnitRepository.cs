@@ -1,7 +1,7 @@
-﻿using API.Contracts.Repositories;
-using API.Model.Entities;
+﻿using pos_api_app.Contracts.Repositories;
+using pos_api_app.Model.Entities;
 
-namespace API.Contracts.Repositories.Entities;
+namespace pos_api_app.Contracts.Repositories.Entities;
 
 public interface IUnitRepository : IGeneralRepository<Unit>
 {

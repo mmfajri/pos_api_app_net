@@ -1,10 +1,10 @@
 ﻿#nullable disable
 using System.Data.Common;
-using API.Model.Entities;
-using API.Models.Entities;
+using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Data;
+namespace pos_api_app.Data;
 
 public class PosDbContext : DbContext
 {

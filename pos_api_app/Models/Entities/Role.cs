@@ -1,12 +1,12 @@
-﻿using API.Models;
+﻿using pos_api_app.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Model.Entities;
+namespace pos_api_app.Model.Entities;
 
 [Table("tb_m_role")]
 public class Role : BaseEntity
 {
-    [Column("name", TypeName ="nvarchar(50)")]
+    [Column("name", TypeName ="varchar(50)")]
     public string Name { get; set; } = string.Empty;
     
     //Cardinality

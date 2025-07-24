@@ -1,8 +1,8 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.Data;
-using API.Model.Entities;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.Data;
+using pos_api_app.Model.Entities;
 
-namespace API.Repository.Entities;
+namespace pos_api_app.Repository.Entities;
 
 public class RoleRepository : GeneralRepository<Role>, IRoleRepository
 {

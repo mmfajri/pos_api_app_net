@@ -1,7 +1,7 @@
-﻿using API.Model.Entities;
+﻿using pos_api_app.Model.Entities;
 using System.Data.Common;
 
-namespace API.DTOs.TransactionsItemDTO;
+namespace pos_api_app.DTOs.TransactionsItemDTO;
 
 public class NewTransactionItemDTO
 {

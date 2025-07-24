@@ -1,12 +1,12 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.Data;
-using API.DTOs.PriceDTO;
-using API.DTOs.ProductDTO;
-using API.DTOs.UnitDTO;
-using API.Model.Entities;
-using API.Models.Entities;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.Data;
+using pos_api_app.DTOs.PriceDTO;
+using pos_api_app.DTOs.ProductDTO;
+using pos_api_app.DTOs.UnitDTO;
+using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 
-namespace API.Services;
+namespace pos_api_app.Services;
 
 public class PriceService
 {

@@ -1,17 +1,17 @@
 using FluentValidation;
-using API.Contracts.Repositories.Entities;
-using API.Contracts.Utilities;
-using API.Data;
-using API.Repository.Entities;
-using API.Services;
-using API.Utilities.Handlers;
+using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.Contracts.Utilities;
+using pos_api_app.Data;
+using pos_api_app.Repository.Entities;
+using pos_api_app.Services;
+using pos_api_app.Utilities.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
-using TokenHandler = API.Utilities.Handlers.TokenHandler;
+using TokenHandler = pos_api_app.Utilities.Handlers.TokenHandler;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,7 +78,7 @@ builder.Services.AddSwaggerGen(x =>
 	{
 		Version = "v1",
 		Title = "Pos Minimarket",
-		Description = "ASP.NET Core API 6.0, Ver.1.0"
+		Description = "ASP.NET Core pos_api_app 6.0, Ver.1.0"
 	});
 	x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	{

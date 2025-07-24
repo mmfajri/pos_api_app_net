@@ -16,8 +16,8 @@ namespace posapiapp.Migrations
                 columns: table => new
                 {
                     guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    barcode_id = table.Column<string>(type: "nvarchar(255)", nullable: false),
-                    title = table.Column<string>(type: "nvarchar(150)", nullable: false),
+                    barcode_id = table.Column<string>(type: "varchar(255)", nullable: false),
+                    title = table.Column<string>(type: "varchar(150)", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
@@ -32,7 +32,7 @@ namespace posapiapp.Migrations
                 columns: table => new
                 {
                     guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    name = table.Column<string>(type: "varchar(50)", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
@@ -62,9 +62,9 @@ namespace posapiapp.Migrations
                 columns: table => new
                 {
                     guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    firstname = table.Column<string>(type: "nvarchar(200)", nullable: false),
-                    lastname = table.Column<string>(type: "nvarchar(200)", nullable: true),
-                    username = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    firstname = table.Column<string>(type: "varchar(200)", nullable: false),
+                    lastname = table.Column<string>(type: "varchar(200)", nullable: true),
+                    username = table.Column<string>(type: "varchar(100)", nullable: false),
                     password = table.Column<string>(type: "text", nullable: false),
                     role_guid = table.Column<Guid>(type: "uuid", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

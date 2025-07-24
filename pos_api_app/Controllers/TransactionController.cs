@@ -1,13 +1,13 @@
-﻿using API.DTOs.TransactionsDTO;
-using API.Services;
-using API.Utilities.Handler;
+﻿using pos_api_app.DTOs.TransactionsDTO;
+using pos_api_app.Services;
+using pos_api_app.Utilities.Handler;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace API.Controllers;
+namespace pos_api_app.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("pos_api_app/[controller]")]
 public class TransactionController : ControllerBase
 {
     private readonly TransactionService _transactionService;

@@ -1,8 +1,8 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.DTOs.ProductDTO;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.DTOs.ProductDTO;
 using FluentValidation;
 
-namespace API.Utilities.Validations.ProductDTO;
+namespace pos_api_app.Utilities.Validations.ProductDTO;
 
 public class NewProductValidation : AbstractValidator<NewProductDTO>
 {

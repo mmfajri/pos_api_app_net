@@ -1,7 +1,7 @@
-﻿using API.DTOs.PriceDTO;
+﻿using pos_api_app.DTOs.PriceDTO;
 using FluentValidation;
 
-namespace API.Utilities.Validations.PriceDTO;
+namespace pos_api_app.Utilities.Validations.PriceDTO;
 
 public class NewPriceValidation : AbstractValidator<NewPriceDTO>
 {

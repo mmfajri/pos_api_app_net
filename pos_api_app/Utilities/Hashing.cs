@@ -1,6 +1,6 @@
 ﻿using BCrypt.Net;
 
-namespace API.Utilities;
+namespace pos_api_app.Utilities;
 
 public class Hashing
 {

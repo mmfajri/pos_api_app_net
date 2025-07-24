@@ -1,7 +1,7 @@
-﻿using API.Model.Entities;
+﻿using pos_api_app.Model.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Models.Entities;
+namespace pos_api_app.Models.Entities;
 
 [Table("tb_tr_price")]
 public class Price : BaseEntity

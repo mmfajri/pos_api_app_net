@@ -1,15 +1,15 @@
-﻿using API.DTOs.PriceDTO;
-using API.DTOs.ProductDTO;
-using API.Services;
-using API.Utilities.Handler;
+﻿using pos_api_app.DTOs.PriceDTO;
+using pos_api_app.DTOs.ProductDTO;
+using pos_api_app.Services;
+using pos_api_app.Utilities.Handler;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
 
-namespace API.Controllers;
+namespace pos_api_app.Controllers;
 
 [ApiController]
-[Route("api/[controller]/")]
+[Route("pos_api_app/[controller]/")]
 public class PriceController : ControllerBase
 {
     private readonly PriceService _priceService;

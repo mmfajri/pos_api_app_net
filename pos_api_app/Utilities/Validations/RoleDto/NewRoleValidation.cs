@@ -1,7 +1,7 @@
-﻿using API.DTOs.RolesDTO;
+﻿using pos_api_app.DTOs.RolesDTO;
 using FluentValidation;
 
-namespace API.Utilities.Validations.RoleDto;
+namespace pos_api_app.Utilities.Validations.RoleDto;
 
 public class NewRoleValidation : AbstractValidator<NewRoleDTO>
 {

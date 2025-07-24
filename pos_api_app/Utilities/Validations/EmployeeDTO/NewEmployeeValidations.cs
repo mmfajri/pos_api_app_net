@@ -1,8 +1,8 @@
-﻿using API.Contracts.Repositories.Entities;
-using API.DTOs.EmployeesDTO;
+﻿using pos_api_app.Contracts.Repositories.Entities;
+using pos_api_app.DTOs.EmployeesDTO;
 using FluentValidation;
 
-namespace API.Utilities.Validations.EmployeeDTO;
+namespace pos_api_app.Utilities.Validations.EmployeeDTO;
 
 public class NewEmployeeValidations : AbstractValidator<NewEmployeeDTO>
 {

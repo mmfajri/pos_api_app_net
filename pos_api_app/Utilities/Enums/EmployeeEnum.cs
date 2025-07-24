@@ -1,4 +1,4 @@
-﻿namespace API.Utilities.Enums;
+﻿namespace pos_api_app.Utilities.Enums;
 
 public enum EmployeeEnum
 {

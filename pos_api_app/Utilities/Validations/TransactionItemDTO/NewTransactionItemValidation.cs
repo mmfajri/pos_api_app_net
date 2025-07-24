@@ -1,12 +1,12 @@
-﻿using API.DTOs.TransactionsItemDTO;
-using API.Utilities.Handler;
-using API.Utilities.Handlers;
+﻿using pos_api_app.DTOs.TransactionsItemDTO;
+using pos_api_app.Utilities.Handler;
+using pos_api_app.Utilities.Handlers;
 using FluentValidation;
-using API.Repository.Entities;
-using API.Contracts.Repositories;
-using API.Contracts.Repositories.Entities;
+using pos_api_app.Repository.Entities;
+using pos_api_app.Contracts.Repositories;
+using pos_api_app.Contracts.Repositories.Entities;
 
-namespace API.Utilities.Validations.TransactionItemDTO;
+namespace pos_api_app.Utilities.Validations.TransactionItemDTO;
 
 public class NewTransactionItemValidation : AbstractValidator<NewTransactionItemDTO>
 {

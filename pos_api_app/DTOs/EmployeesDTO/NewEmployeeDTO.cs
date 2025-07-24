@@ -1,7 +1,7 @@
-﻿using API.Model.Entities;
-using API.Utilities.Enums;
+﻿using pos_api_app.Model.Entities;
+using pos_api_app.Utilities.Enums;
 
-namespace API.DTOs.EmployeesDTO;
+namespace pos_api_app.DTOs.EmployeesDTO;
 
 public class NewEmployeeDTO
 {

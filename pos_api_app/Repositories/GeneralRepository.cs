@@ -1,7 +1,7 @@
-﻿using API.Contracts.Repositories;
-using API.Data;
+﻿using pos_api_app.Contracts.Repositories;
+using pos_api_app.Data;
 
-namespace API.Repository;
+namespace pos_api_app.Repository;
 
 public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
     where TEntity : class

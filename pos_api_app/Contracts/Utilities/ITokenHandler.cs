@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace API.Contracts.Utilities;
+namespace pos_api_app.Contracts.Utilities;
 
 public interface ITokenHandler
 {

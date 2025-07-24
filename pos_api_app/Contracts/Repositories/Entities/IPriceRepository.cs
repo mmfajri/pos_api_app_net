@@ -1,8 +1,8 @@
-﻿using API.Contracts.Repositories;
-using API.Model.Entities;
-using API.Models.Entities;
+﻿using pos_api_app.Contracts.Repositories;
+using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 
-namespace API.Contracts.Repositories.Entities;
+namespace pos_api_app.Contracts.Repositories.Entities;
 
 public interface IPriceRepository : IGeneralRepository<Price>
 {

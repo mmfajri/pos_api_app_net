@@ -1,7 +1,7 @@
-﻿using API.DTOs.TransactionsItemDTO;
-using API.Model.Entities;
+﻿using pos_api_app.DTOs.TransactionsItemDTO;
+using pos_api_app.Model.Entities;
 
-namespace API.DTOs.TransactionsDTO;
+namespace pos_api_app.DTOs.TransactionsDTO;
 
 public class TransactionDTO
 {

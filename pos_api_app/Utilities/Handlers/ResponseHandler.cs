@@ -1,4 +1,4 @@
-﻿namespace API.Utilities.Handler;
+﻿namespace pos_api_app.Utilities.Handler;
 
 public class ResponseHandler<TEntity>
 {

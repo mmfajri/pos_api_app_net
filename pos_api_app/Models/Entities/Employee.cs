@@ -1,18 +1,18 @@
-﻿using API.Models;
+﻿using pos_api_app.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Model.Entities;
+namespace pos_api_app.Model.Entities;
 
 [Table("tb_m_employee")]
 public class Employee : BaseEntity
 {
-    [Column("firstname", TypeName ="nvarchar(200)")]
+    [Column("firstname", TypeName ="varchar(200)")]
     public string FirstName { get; set; } = string.Empty;
     
-    [Column("lastname", TypeName ="nvarchar(200)")]
+    [Column("lastname", TypeName ="varchar(200)")]
     public string? LastName { get; set; }
 
-    [Column("username", TypeName ="nvarchar(100)")]
+    [Column("username", TypeName ="varchar(100)")]
     public string UserName { get; set; } = string.Empty;
 
     [Column("password")]

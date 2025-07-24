@@ -1,8 +1,8 @@
-﻿using API.DTOs.TransactionsDTO;
-using API.Utilities.Handlers;
+﻿using pos_api_app.DTOs.TransactionsDTO;
+using pos_api_app.Utilities.Handlers;
 using FluentValidation;
 
-namespace API.Utilities.Validations.TransactionDTO;
+namespace pos_api_app.Utilities.Validations.TransactionDTO;
 
 public class NewTransactionValidation : AbstractValidator<NewTransactionDTO>
 {

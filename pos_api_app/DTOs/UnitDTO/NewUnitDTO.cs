@@ -1,6 +1,6 @@
-﻿using API.Model.Entities;
+﻿using pos_api_app.Model.Entities;
 
-namespace API.DTOs.UnitDTO;
+namespace pos_api_app.DTOs.UnitDTO;
 
 public class NewUnitDTO
 {
