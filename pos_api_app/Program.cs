@@ -44,63 +44,63 @@ builder.Services.AddScoped<ITokenHandler, TokenHandler>();
 //Build Cors Service
 builder.Services.AddCors(options =>
 {
-	options.AddDefaultPolicy(policy =>
-	{
-		policy.AllowAnyHeader();
-		policy.AllowAnyOrigin();
-		policy.AllowAnyMethod();
-	});
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyOrigin();
+        policy.AllowAnyMethod();
+    });
 });
 
 //JWT Configuration
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-	    options.RequireHttpsMetadata = false; // for development stage
-	    options.SaveToken = true;
-	    options.TokenValidationParameters = new TokenValidationParameters()
-	    {
-		    ValidateIssuer = true,
-		    ValidIssuer = builder.Configuration["JWTService:Issuer"],
-		    ValidateAudience = true,
-		    ValidAudience = builder.Configuration["JWTService:Audience"],
-		    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTService:Key"] ?? string.Empty)),
-		    ValidateLifetime = true,
-		    ClockSkew = TimeSpan.Zero
-	    };
+        options.RequireHttpsMetadata = false; // for development stage
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["JWTService:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["JWTService:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTService:Key"] ?? string.Empty)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
     });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
-	x.SwaggerDoc("v1", new OpenApiInfo
-	{
-		Version = "v1",
-		Title = "Pos Minimarket",
-		Description = "ASP.NET Core pos_api_app 6.0, Ver.1.0"
-	});
-	x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-	{
-		Name = "Authorization",
-		Type = SecuritySchemeType.Http,
-		Scheme = "Bearer",
-		BearerFormat = "JWT",
-		In = ParameterLocation.Header,
-		Description = "JWT Authorization header using the Bearer scheme."
-	});
-	x.AddSecurityRequirement(new OpenApiSecurityRequirement
+    x.SwaggerDoc("v1", new OpenApiInfo
     {
-	{
-	    new OpenApiSecurityScheme
-	    {
-		Reference = new OpenApiReference
-		{
-		    Type = ReferenceType.SecurityScheme,
-		    Id = "Bearer"
-		}
-	    },
-        Array.Empty<string>()
+        Version = "v1",
+        Title = "Pos Minimarket",
+        Description = "ASP.NET Core pos_api_app 6.0, Ver.1.0"
+    });
+    x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+    x.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+    {
+    new OpenApiSecurityScheme
+    {
+    Reference = new OpenApiReference
+    {
+        Type = ReferenceType.SecurityScheme,
+        Id = "Bearer"
+    }
+    },
+    Array.Empty<string>()
     }
     });
 });
@@ -110,16 +110,16 @@ var app = builder.Build();
 // Auto Migrate
 using (var scope = app.Services.CreateScope())
 {
-	var dbContext = scope.ServiceProvider.GetRequiredService<PosDbContext>();
-	await dbContext.Database.EnsureCreatedAsync();
-	//await dbContext.Database.MigrateAsync();
+    var dbContext = scope.ServiceProvider.GetRequiredService<PosDbContext>();
+    await dbContext.Database.EnsureCreatedAsync();
+    //await dbContext.Database.MigrateAsync();
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-	app.UseSwagger();
-	app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

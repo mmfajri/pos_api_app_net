@@ -1,6 +1,6 @@
 ﻿#nullable disable
 using System.Data.Common;
-using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +10,7 @@ public class PosDbContext : DbContext
 {
     public PosDbContext(DbContextOptions<PosDbContext> options) : base(options) { }
 
+    public DbSet<Account> Accounts { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Price> Prices { get; set; }
     public DbSet<Product> Products { get; set; }
@@ -23,16 +24,24 @@ public class PosDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         //Set Unique
-        modelBuilder.Entity<Employee>().HasIndex(emp => new
+        modelBuilder.Entity<Account>().HasIndex(emp => new
         {
             emp.UserName
         }).IsUnique();
 
         //Set Relationship and Cardinality
 
-        //Role to Employee (One to Many)
+        //Account to Employee (One to One)
+        modelBuilder.Entity<Account>()
+            .HasOne(account => account.Employee)
+            .WithOne(employee => employee.Account)
+            .HasForeignKey<Employee>(employee => employee.AccountGuid)
+            .OnDelete(DeleteBehavior.SetNull);
+
+
+        //Role to Account (One to Many)
         modelBuilder.Entity<Role>()
-            .HasMany(role => role.Employees)
+            .HasMany(role => role.Accounts)
             .WithOne(employee => employee.Role)
             .HasForeignKey(employee => employee.RoleGuid)
             .OnDelete(DeleteBehavior.SetNull);
@@ -74,7 +83,7 @@ public class PosDbContext : DbContext
 
         //TransactionItem to Price (Many to One)
         modelBuilder.Entity<TransactionItem>()
-            .HasOne(transaction_item=> transaction_item.Price)
+            .HasOne(transaction_item => transaction_item.Price)
             .WithMany(price => price.TransactionItems)
             .HasForeignKey(TransactionItem => TransactionItem.PriceGuid)
             .OnDelete(DeleteBehavior.SetNull);

@@ -2,7 +2,7 @@
 using pos_api_app.Data;
 using pos_api_app.DTOs.TransactionsDTO;
 using pos_api_app.DTOs.TransactionsItemDTO;
-using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 using System.Data;
 using System.Net;
 

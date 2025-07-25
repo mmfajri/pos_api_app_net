@@ -1,4 +1,4 @@
-﻿using pos_api_app.Model.Entities;
+﻿using pos_api_app.Models.Entities;
 using System.Data.Common;
 
 namespace pos_api_app.DTOs.TransactionsItemDTO;

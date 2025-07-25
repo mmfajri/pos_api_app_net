@@ -2,7 +2,7 @@
 using pos_api_app.Data;
 using pos_api_app.DTOs.EmployeesDTO;
 using pos_api_app.DTOs.RolesDTO;
-using pos_api_app.Model.Entities;
+using pos_api_app.Models.Entities;
 using pos_api_app.Repository.Entities;
 using pos_api_app.Utilities.Enums;
 
@@ -69,7 +69,7 @@ public class EmployeeService
                 var roleToUse = getRole ?? newRole;
 
                 var newEmployee = (Employee) newEmployeeDTO;
-                newEmployee.RoleGuid = roleToUse!.Guid;
+                //newEmployee.RoleGuid = roleToUse!.Guid;
 
                 var createdEmployee = _employeeRepository.Create(newEmployee);
                 if(createdEmployee != null)
@@ -100,7 +100,7 @@ public class EmployeeService
 
                 //set new employee
                 var newEmployee = (Employee)employeeDTO;
-                newEmployee.RoleGuid = getEmployee.RoleGuid;
+                //newEmployee.RoleGuid = getEmployee.RoleGuid;
 
                 // update the employee
                 var updateEmployee = _employeeRepository.Update(newEmployee);

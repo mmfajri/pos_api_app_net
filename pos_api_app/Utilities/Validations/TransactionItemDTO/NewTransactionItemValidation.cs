@@ -1,5 +1,4 @@
 ﻿using pos_api_app.DTOs.TransactionsItemDTO;
-using pos_api_app.Utilities.Handler;
 using pos_api_app.Utilities.Handlers;
 using FluentValidation;
 using pos_api_app.Repository.Entities;

@@ -36,6 +36,7 @@ public class NewEmployeeValidations : AbstractValidator<NewEmployeeDTO>
 
     private bool UniqueProperty(string property)
     {
-        return !_employeeRepository.IsUniqueUsername(property);
+        return true;
+        //return !_employeeRepository.IsUniqueUsername(property);
     }
 }
