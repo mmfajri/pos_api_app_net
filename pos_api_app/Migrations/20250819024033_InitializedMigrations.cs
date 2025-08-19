@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace posapiapp.Migrations
+namespace pos_api_app.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitializedMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,14 +58,12 @@ namespace posapiapp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "tb_m_employee",
+                name: "tb_m_account",
                 columns: table => new
                 {
                     guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    firstname = table.Column<string>(type: "varchar(200)", nullable: false),
-                    lastname = table.Column<string>(type: "varchar(200)", nullable: true),
                     username = table.Column<string>(type: "varchar(100)", nullable: false),
-                    password = table.Column<string>(type: "text", nullable: false),
+                    password = table.Column<string>(type: "varchar(200)", nullable: false),
                     role_guid = table.Column<Guid>(type: "uuid", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -73,13 +71,12 @@ namespace posapiapp.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_employee", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_account", x => x.guid);
                     table.ForeignKey(
-                        name: "FK_tb_m_employee_tb_m_role_role_guid",
+                        name: "FK_tb_m_account_tb_m_role_role_guid",
                         column: x => x.role_guid,
                         principalTable: "tb_m_role",
-                        principalColumn: "guid",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "guid");
                 });
 
             migrationBuilder.CreateTable(
@@ -101,14 +98,40 @@ namespace posapiapp.Migrations
                         name: "FK_tb_tr_price_tb_m_product_product_guid",
                         column: x => x.product_guid,
                         principalTable: "tb_m_product",
-                        principalColumn: "guid",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "guid");
                     table.ForeignKey(
                         name: "FK_tb_tr_price_tb_m_unit_price_guid",
                         column: x => x.price_guid,
                         principalTable: "tb_m_unit",
-                        principalColumn: "guid",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "guid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "tb_m_employee",
+                columns: table => new
+                {
+                    guid = table.Column<Guid>(type: "uuid", nullable: false),
+                    firstname = table.Column<string>(type: "varchar(200)", nullable: false),
+                    lastname = table.Column<string>(type: "varchar(200)", nullable: true),
+                    account_guid = table.Column<Guid>(type: "uuid", nullable: true),
+                    RoleGuid = table.Column<Guid>(type: "uuid", nullable: true),
+                    created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tb_m_employee", x => x.guid);
+                    table.ForeignKey(
+                        name: "FK_tb_m_employee_tb_m_account_account_guid",
+                        column: x => x.account_guid,
+                        principalTable: "tb_m_account",
+                        principalColumn: "guid");
+                    table.ForeignKey(
+                        name: "FK_tb_m_employee_tb_m_role_RoleGuid",
+                        column: x => x.RoleGuid,
+                        principalTable: "tb_m_role",
+                        principalColumn: "guid");
                 });
 
             migrationBuilder.CreateTable(
@@ -119,6 +142,7 @@ namespace posapiapp.Migrations
                     employee_guid = table.Column<Guid>(type: "uuid", nullable: true),
                     transaction_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     total_ammount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    AccountGuid = table.Column<Guid>(type: "uuid", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
@@ -126,6 +150,11 @@ namespace posapiapp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tb_tr_transaction", x => x.guid);
+                    table.ForeignKey(
+                        name: "FK_tb_tr_transaction_tb_m_account_AccountGuid",
+                        column: x => x.AccountGuid,
+                        principalTable: "tb_m_account",
+                        principalColumn: "guid");
                     table.ForeignKey(
                         name: "FK_tb_tr_transaction_tb_m_employee_employee_guid",
                         column: x => x.employee_guid,
@@ -154,32 +183,40 @@ namespace posapiapp.Migrations
                         name: "FK_tb_m_transaction_item_tb_m_product_product_guid",
                         column: x => x.product_guid,
                         principalTable: "tb_m_product",
-                        principalColumn: "guid",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "guid");
                     table.ForeignKey(
                         name: "FK_tb_m_transaction_item_tb_tr_price_price_guid",
                         column: x => x.price_guid,
                         principalTable: "tb_tr_price",
-                        principalColumn: "guid",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "guid");
                     table.ForeignKey(
                         name: "FK_tb_m_transaction_item_tb_tr_transaction_transaction_guid",
                         column: x => x.transaction_guid,
                         principalTable: "tb_tr_transaction",
-                        principalColumn: "guid",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "guid");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_employee_role_guid",
-                table: "tb_m_employee",
+                name: "IX_tb_m_account_role_guid",
+                table: "tb_m_account",
                 column: "role_guid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_employee_username",
-                table: "tb_m_employee",
+                name: "IX_tb_m_account_username",
+                table: "tb_m_account",
                 column: "username",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tb_m_employee_account_guid",
+                table: "tb_m_employee",
+                column: "account_guid",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tb_m_employee_RoleGuid",
+                table: "tb_m_employee",
+                column: "RoleGuid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_tb_m_transaction_item_price_guid",
@@ -207,6 +244,11 @@ namespace posapiapp.Migrations
                 column: "product_guid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_tb_tr_transaction_AccountGuid",
+                table: "tb_tr_transaction",
+                column: "AccountGuid");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_tb_tr_transaction_employee_guid",
                 table: "tb_tr_transaction",
                 column: "employee_guid");
@@ -232,6 +274,9 @@ namespace posapiapp.Migrations
 
             migrationBuilder.DropTable(
                 name: "tb_m_employee");
+
+            migrationBuilder.DropTable(
+                name: "tb_m_account");
 
             migrationBuilder.DropTable(
                 name: "tb_m_role");
