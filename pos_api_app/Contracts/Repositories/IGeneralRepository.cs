@@ -2,10 +2,10 @@
 
 public interface IGeneralRepository<TEntity>
 {
-    IEnumerable<TEntity> GetAll();
-    TEntity? GetByGuid(Guid guid);
-    TEntity? Create(TEntity entity);
-    bool Update(TEntity entity);
-    bool Delete(TEntity entity);
-    bool IsExits(Guid guid);
+	Task<IEnumerable<TEntity>> GetAll();
+	Task<TEntity?> GetByGuid(Guid guid);
+	Task<TEntity?> Create(TEntity entity);
+	Task<bool> Update(TEntity entity);
+	Task<bool> Delete(TEntity entity);
+	Task<bool> IsExits(Guid guid);
 }

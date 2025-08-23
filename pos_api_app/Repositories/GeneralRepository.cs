@@ -4,7 +4,7 @@ using pos_api_app.Data;
 
 namespace pos_api_app.Repository;
 
-public class GeneralRepository<TEntity> /*: IGeneralRepository<TEntity>*/
+public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
     where TEntity : class
 {
 	protected readonly PosDbContext _posDbContext;
@@ -67,9 +67,9 @@ public class GeneralRepository<TEntity> /*: IGeneralRepository<TEntity>*/
 		}
 	}
 
-	public bool IsExits(Guid guid)
+	public async Task<bool> IsExits(Guid guid)
 	{
-		return GetByGuid(guid) != null;
+		return await GetByGuid(guid) != null;
 	}
 
 }
