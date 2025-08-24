@@ -18,6 +18,11 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("Register")]
-	public Task<IActionResult> Register(Regis)
+	public Task<IActionResult> Register(RegisterDTO req)
+	{
+		var
+    
+
+    }
 
 }
