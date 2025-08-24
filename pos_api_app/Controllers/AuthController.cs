@@ -18,11 +18,15 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("Register")]
-	public Task<IActionResult> Register(RegisterDTO req)
+	public async Task<IActionResult> Register(RegisterDTO req)
 	{
-		var
-    
+		var response = await _authService.RegisterUser(req);
 
-    }
+		if (response.StatusCode != StatusCodes.Status200OK)
+			return BadRequest(response);
+
+		return Ok(response);
+
+	}
 
 }

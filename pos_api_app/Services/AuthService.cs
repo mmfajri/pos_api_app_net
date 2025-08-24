@@ -36,7 +36,6 @@ public class AuthService
 		var isSuccess = await _accountRepository.Create((Account)req);
 
 
-
 		return response;
 	}
 
