@@ -39,4 +39,30 @@ public class AuthService
 		return response;
 	}
 
+	public async Task<ResponseDTO<AuthDTO>> Login(LoginDTO req)
+	{
+		var response = new ResponseDTO<AuthDTO>();
+
+		// Get Username
+		var dataUser = await _accountRepository.GetAccountByUsername(req.Username);
+
+		if (dataUser is null)
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = "User Not Found";
+			return response;
+		}
+
+		if (dataUser.Password != req.Password)
+		{
+			response.StatusCode = StatusCodes.Status403Forbidden;
+			response.Message = "Invalid Credential Username";
+			return response;
+		}
+
+		// Generate Token JWT
+
+		return response;
+
+	}
 }

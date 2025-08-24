@@ -26,7 +26,31 @@ public class AuthController : ControllerBase
 			return BadRequest(response);
 
 		return Ok(response);
-
 	}
 
+	[HttpGet("Login")]
+	public async Task<IActionResult> Login(LoginDTO req)
+	{
+		var response = await _authService.Login(req);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
+				{
+					return Unauthorized(response);
+				}
+			default:
+				{
+					return Ok(response);
+				}
+		}
+
+	}
 }
+
+
+
+
