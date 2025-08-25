@@ -20,9 +20,9 @@ public class PriceController : ControllerBase
 	}
 
 	[HttpGet]
-	public IActionResult GetPrice()
+	public async Task<IActionResult> GetPrice()
 	{
-		var listPrice = _priceService.GetAll();
+		var listPrice = await _priceService.GetAll();
 		if (listPrice == null) return NotFound(new ResponseHandler<PriceDTO>
 		{
 			Code = StatusCodes.Status404NotFound,
@@ -38,10 +38,10 @@ public class PriceController : ControllerBase
 			Data = listPrice
 		});
 	}
-	[HttpGet("{guid}")]
-	public IActionResult GetPrice(Guid guid)
+	[HttpGet("{id}")]
+	public async Task<IActionResult> GetPrice(int id)
 	{
-		var price = _priceService.GetPrice(guid);
+		var price = await _priceService.GetPrice(id);
 		if (price == null) return NotFound(new ResponseHandler<PriceDTO>
 		{
 			Code = StatusCodes.Status404NotFound,
@@ -59,9 +59,9 @@ public class PriceController : ControllerBase
 	}
 
 	[HttpPost("AddPrice/")]
-	public IActionResult AddPrice(NewPriceDTO newPriceDTO)
+	public async Task<IActionResult> AddPrice(NewPriceDTO newPriceDTO)
 	{
-		var created = _priceService.Create(newPriceDTO);
+		var created = await _priceService.Create(newPriceDTO);
 		if (created != null)
 		{
 			return Ok(new ResponseHandler<PriceDTO>
@@ -81,9 +81,9 @@ public class PriceController : ControllerBase
 	}
 
 	[HttpPut("UpdatePrice/")]
-	public IActionResult UpdatePrice(PriceDTO price)
+	public async Task<IActionResult> UpdatePrice(PriceDTO price)
 	{
-		var updated = _priceService.Edit(price);
+		var updated = await _priceService.Edit(price);
 		if (updated == false) return NotFound(new ResponseHandler<bool>
 		{
 			Code = StatusCodes.Status404NotFound,
@@ -101,10 +101,10 @@ public class PriceController : ControllerBase
 		});
 	}
 
-	[HttpDelete("DeletePrice/{guid}")]
-	public IActionResult DeletePrice(Guid guid)
+	[HttpDelete("DeletePrice/{id}")]
+	public async Task<IActionResult> DeletePrice(int id)
 	{
-		var deleted = _priceService.Delete(guid);
+		var deleted = await _priceService.Delete(id);
 		if (deleted == -1) return BadRequest(new ResponseHandler<PriceDTO>
 		{
 			Code = StatusCodes.Status400BadRequest,

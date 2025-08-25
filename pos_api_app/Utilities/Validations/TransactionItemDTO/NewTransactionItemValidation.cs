@@ -9,22 +9,27 @@ namespace pos_api_app.Utilities.Validations.TransactionItemDTO;
 
 public class NewTransactionItemValidation : AbstractValidator<NewTransactionItemDTO>
 {
-    private readonly IProductRepository _repository;
-    public NewTransactionItemValidation(IProductRepository repository)
-    {
-        _repository = repository;
+	private readonly IProductRepository _repository;
+	public NewTransactionItemValidation(IProductRepository repository)
+	{
+		_repository = repository;
 
-        RuleFor(attr => attr.Quantity)
-            .NotEmpty().WithMessage("Quantity is required")
-            .GreaterThanOrEqualTo(0).WithMessage("Quantity must greater than or equal to 0")
-            .Must(OnlyNumberHandler<float>.ValidNumber).WithMessage("Quantity should contain only numbers, dots, or commas");
+		RuleFor(attr => attr.Quantity)
+		    .NotEmpty().WithMessage("Quantity is required")
+		    .GreaterThanOrEqualTo(0).WithMessage("Quantity must greater than or equal to 0")
+		    .Must(OnlyNumberHandler<float>.ValidNumber).WithMessage("Quantity should contain only numbers, dots, or commas");
 
-        RuleFor(attr => attr.Subtotal)
-            .NotEmpty().WithMessage("Subtotal is required")
-            .GreaterThanOrEqualTo(0).WithMessage("Subtotal must greater than or equal to 0")
-            .Must(OnlyNumberHandler<decimal>.ValidNumber).WithMessage("Subtotal should contain only numbers, dots, or commas");
-        RuleFor(attr => attr.PriceId)
-            .NotEmpty().WithMessage("Product guid tidak boleh kosong")
-            .Must(id => id.HasValue && _repository.IsProductExist(id.Value)).WithMessage("Product Tidak Tersedia di Database");
-    }
+		RuleFor(attr => attr.Subtotal)
+		    .NotEmpty().WithMessage("Subtotal is required")
+		    .GreaterThanOrEqualTo(0).WithMessage("Subtotal must greater than or equal to 0")
+		    .Must(OnlyNumberHandler<decimal>.ValidNumber).WithMessage("Subtotal should contain only numbers, dots, or commas");
+		RuleFor(attr => attr.PriceId)
+		    .NotEmpty().WithMessage("Price must not empty")
+		    .Must(id => id.HasValue).WithMessage("Price must have value")
+		    .MustAsync(async (id, cancellation) =>
+		    {
+			    return id.HasValue && await _repository.IsProductExist(id.Value);
+		    })
+		    .WithMessage("Price is not exit");
+	}
 }
