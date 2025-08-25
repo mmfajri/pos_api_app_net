@@ -1,6 +1,4 @@
 ﻿#nullable disable
-using System.Data.Common;
-using pos_api_app.Models.Entities;
 using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 

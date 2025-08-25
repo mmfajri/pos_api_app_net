@@ -1,9 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<!-- Only show warnings and errors -->
+		<AnalysisLevel>latest</AnalysisLevel>
+		<WarningLevel>4</WarningLevel>
+		<NoWarn>IDE0001;IDE0051</NoWarn>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<!-- Suppress "Info" severity diagnostics -->
+		<SeverityLevel>warning</SeverityLevel>
+		<!-- Disable IDE suggestions (info) -->
+		<EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
