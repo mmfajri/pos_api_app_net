@@ -4,7 +4,7 @@ namespace pos_api_app.DTOs.ProductDTO;
 
 public class ProductDTO
 {
-    public Guid Guid { get; set; }
+    public int Id { get; set; }
     public string BarcodeId { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
 
@@ -13,7 +13,7 @@ public class ProductDTO
     {
         return new ProductDTO
         {
-            Guid = product.Guid,
+            Id = product.Id,
             BarcodeId = product.BarcodeID,
             Title = product.Title,
         };
@@ -23,7 +23,6 @@ public class ProductDTO
     {
         return new Product
         {
-            Guid = productDTO.Guid,
             BarcodeID = productDTO.BarcodeId,
             Title = productDTO.Title,
         };

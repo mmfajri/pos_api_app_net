@@ -5,8 +5,8 @@ namespace pos_api_app.DTOs.TransactionsItemDTO;
 
 public class NewTransactionItemDTO
 {
-    public Guid? ProductGuid { get; set; }
-    public Guid? PriceGuid { get; set; }
+    public int? ProductId { get; set; }
+    public int? PriceId { get; set; }
     public float Quantity { get; set; }
     public decimal Subtotal { get; set; }
 
@@ -14,9 +14,8 @@ public class NewTransactionItemDTO
     {
         return new TransactionItem
         {
-            Guid = Guid.NewGuid(),
-            ProductGuid = transactionItem.ProductGuid,
-            PriceGuid = transactionItem.PriceGuid,
+            ProductId = transactionItem.ProductId,
+            PriceId = transactionItem.PriceId,
             Quantity = transactionItem.Quantity,
             Subtotal = transactionItem.Subtotal,
         };

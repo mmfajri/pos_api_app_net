@@ -5,8 +5,8 @@ namespace pos_api_app.DTOs.TransactionsDTO;
 
 public class TransactionDTO
 {
-    public Guid Guid { get; set; }
-    public Guid? EmployeeGuid { get; set; }
+    public int Id { get; set; }
+    public int? AccountId { get; set; }
     public DateTime TransactionDate { get; set; }
     public decimal? TotalAmmount { get; set; }
     public ICollection<TransactionItemDTO>? TransactionItemsDTO { get; set; }
@@ -15,8 +15,8 @@ public class TransactionDTO
     {
         return new TransactionDTO
         {
-            Guid = transaction.Guid,
-            EmployeeGuid = transaction.EmployeeGuid,
+            Id = transaction.Id,
+            AccountId = transaction.AccountId,
             TransactionDate = transaction.TransactionsDate,
             TotalAmmount = transaction.TotalAmmount
         };
@@ -25,8 +25,7 @@ public class TransactionDTO
     {
         return new Transaction
         {
-            Guid = transactionDTO.Guid,
-            EmployeeGuid = transactionDTO.EmployeeGuid,
+            AccountId = transactionDTO.AccountId,
             TransactionsDate = transactionDTO.TransactionDate,
             TotalAmmount = transactionDTO.TotalAmmount
         };

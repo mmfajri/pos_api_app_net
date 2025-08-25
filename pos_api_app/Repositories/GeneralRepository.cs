@@ -19,9 +19,9 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 		return await _posDbContext.Set<TEntity>().ToListAsync();
 	}
 
-	public async Task<TEntity?> GetByGuid(Guid guid)
+	public async Task<TEntity?> GetById(int id)
 	{
-		var entity = await _posDbContext.Set<TEntity>().FindAsync(guid);
+		var entity = await _posDbContext.Set<TEntity>().FindAsync(id);
 		_posDbContext.ChangeTracker.Clear();
 		return entity;
 	}
@@ -67,9 +67,9 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 		}
 	}
 
-	public async Task<bool> IsExits(Guid guid)
+	public async Task<bool> IsExits(int id)
 	{
-		return await GetByGuid(guid) != null;
+		return await GetById(id) != null;
 	}
 
 }

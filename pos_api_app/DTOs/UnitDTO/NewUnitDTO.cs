@@ -10,7 +10,6 @@ public class NewUnitDTO
     {
         return new Unit
         {
-            Guid = Guid.NewGuid(),
             Name = newUnitDTO.Name,
         };
     }

@@ -4,7 +4,7 @@ namespace pos_api_app.DTOs.PriceDTO;
 
 public class NewPriceDTO
 {
-    public Guid ProductGuid { get; set; }
+    public int? ProductId { get; set; }
     public String UnitName { get; set; } = string.Empty;
     public decimal Amount { get; set; }
 
@@ -12,8 +12,7 @@ public class NewPriceDTO
     {
         return new Price
         {
-            Guid = Guid.NewGuid(),
-            ProductGuid = newPriceDTO.ProductGuid,
+            ProductId = newPriceDTO.ProductId,
             Amount = newPriceDTO.Amount
         };
     }

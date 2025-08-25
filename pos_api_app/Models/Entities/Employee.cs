@@ -12,8 +12,8 @@ public class Employee : BaseEntity
     [Column("lastname", TypeName = "varchar(200)")]
     public string? LastName { get; set; }
 
-    [Column("account_guid")]
-    public Guid? AccountGuid { get; set; }
+    [Column("account_id")]
+    public int? AccountId { get; set; }
 
     //Cardinality
     public Role? Role { get; set; }

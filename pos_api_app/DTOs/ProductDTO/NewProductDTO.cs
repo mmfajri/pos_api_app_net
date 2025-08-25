@@ -11,7 +11,6 @@ public class NewProductDTO
     {
         return new Product
         {
-            Guid = Guid.NewGuid(),
             BarcodeID = product.BarcodeID,
             Title = product.Title,
         };

@@ -22,8 +22,8 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
         return _posDbContext.Set<Product>().Any(product => product.BarcodeID == barcode);
     }
 
-    public bool IsProductExist(Guid guid)
+    public bool IsProductExist(int id)
     {
-        return _posDbContext.Set<Product>().Any(product => product.Guid == guid);
+        return _posDbContext.Set<Product>().Any(product => product.Id == id);
     }
 }

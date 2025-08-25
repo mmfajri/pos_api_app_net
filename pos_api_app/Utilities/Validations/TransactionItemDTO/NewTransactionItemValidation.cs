@@ -23,8 +23,8 @@ public class NewTransactionItemValidation : AbstractValidator<NewTransactionItem
             .NotEmpty().WithMessage("Subtotal is required")
             .GreaterThanOrEqualTo(0).WithMessage("Subtotal must greater than or equal to 0")
             .Must(OnlyNumberHandler<decimal>.ValidNumber).WithMessage("Subtotal should contain only numbers, dots, or commas");
-        RuleFor(attr => attr.PriceGuid)
+        RuleFor(attr => attr.PriceId)
             .NotEmpty().WithMessage("Product guid tidak boleh kosong")
-            .Must(guid => guid.HasValue && _repository.IsProductExist(guid.Value)).WithMessage("Product Tidak Tersedia di Database");
+            .Must(id => id.HasValue && _repository.IsProductExist(id.Value)).WithMessage("Product Tidak Tersedia di Database");
     }
 }

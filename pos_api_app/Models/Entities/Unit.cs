@@ -7,8 +7,8 @@ namespace pos_api_app.Models.Entities;
 [Table("tb_m_unit")]
 public class Unit : BaseEntity
 {
-	public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
-	//Cardinality
-	public ICollection<Price>? Prices { get; set; }
+    //Cardinality
+    public ICollection<Price>? Prices { get; set; }
 }

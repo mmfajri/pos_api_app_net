@@ -6,7 +6,7 @@ namespace pos_api_app.DTOs.TransactionsDTO;
 
 public class NewTransactionDTO
 {
-    public Guid? EmployeeGuid { get; set; }
+    public int? AccountId { get; set; }
     public DateTime TransactionDate { get; set; }
     public decimal TotalAmmount { get; set; }
     public IEnumerable<NewTransactionItemDTO>? TransactionItemDTOs { get; set; }
@@ -15,8 +15,7 @@ public class NewTransactionDTO
     {
         return new Transaction
         {
-            Guid = Guid.NewGuid(),
-            EmployeeGuid = newTransactionDTO.EmployeeGuid,
+            AccountId = newTransactionDTO.AccountId,
             TransactionsDate = newTransactionDTO.TransactionDate,
             TotalAmmount = newTransactionDTO.TotalAmmount,
         };
