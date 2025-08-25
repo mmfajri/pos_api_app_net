@@ -10,132 +10,134 @@ namespace pos_api_app.Services;
 
 public class EmployeeService
 {
-    private readonly IEmployeeRepository _employeeRepository;
-    private readonly IRoleRepository _roleRepository;
-    private readonly PosDbContext _posDbContext;
+	private readonly IEmployeeRepository _employeeRepository;
+	private readonly IRoleRepository _roleRepository;
+	private readonly PosDbContext _posDbContext;
 
-    public EmployeeService(IEmployeeRepository employeeRepository,
-                           IRoleRepository  roleRepository,
-                           PosDbContext posDbContext)
-    {
-        _employeeRepository = employeeRepository;
-        _roleRepository = roleRepository;
-        _posDbContext = posDbContext;
-    }
+	public EmployeeService(IEmployeeRepository employeeRepository,
+	       IRoleRepository roleRepository,
+	       PosDbContext posDbContext)
+	{
+		_employeeRepository = employeeRepository;
+		_roleRepository = roleRepository;
+		_posDbContext = posDbContext;
+	}
 
-    public IEnumerable<EmployeeDTO>? Get() 
-    {
-        var employeeList = _employeeRepository.GetAll();
-        if(employeeList == null || !employeeList.Any())
-        {
-            return null;
-        }
+	public async Task<IEnumerable<EmployeeDTO>?> Get()
+	{
+		var employeeList = await _employeeRepository.GetAll();
+		if (employeeList == null || !employeeList.Any())
+		{
+			return null;
+		}
 
-        var dto = employeeList.Select(employee => (EmployeeDTO)employee);
-        return dto;
+		var dto = employeeList.Select(employee => (EmployeeDTO)employee);
+		return dto;
 
-    }
+	}
 
-    public EmployeeDTO? Get(Guid guid)
-    {
-        var employee = _employeeRepository.GetByGuid(guid);
-        if(employee == null) 
-        {
-            return null;
-        }
+	public async Task<EmployeeDTO?> Get(int id)
+	{
+		var employee = await _employeeRepository.GetById(id);
+		if (employee == null)
+		{
+			return null;
+		}
 
-        var dto = (EmployeeDTO) employee;
-        return dto;
-    }
+		var dto = (EmployeeDTO)employee;
+		return dto;
+	}
 
-    public EmployeeDTO? Create(NewEmployeeDTO newEmployeeDTO)
-    {
-        using(var transactions = _posDbContext.Database.BeginTransaction()) 
-        {
-            try
-            {
-                //check existing role in employee's input
-                var getRole = _roleRepository.GetByName(nameof(newEmployeeDTO.RoleSet));
-                Role? newRole = null;
-                
-                if (getRole == null)
-                {
-                    newRole = (Role)new NewRoleDTO
-                    {
-                        Name = Enum.GetName(typeof(EmployeeEnum), newEmployeeDTO.RoleSet)!
-                    };
-                    newRole = _roleRepository.Create(newRole);
-                }
-                var roleToUse = getRole ?? newRole;
+	public async Task<EmployeeDTO?> Create(NewEmployeeDTO newEmployeeDTO)
+	{
+		using (var transactions = _posDbContext.Database.BeginTransaction())
+		{
+			try
+			{
+				//check existing role in employee's input
+				var getRole = await _roleRepository.GetByName(nameof(newEmployeeDTO.RoleSet));
+				Role? newRole = null;
 
-                var newEmployee = (Employee) newEmployeeDTO;
-                //newEmployee.RoleGuid = roleToUse!.Guid;
+				if (getRole == null)
+				{
+					newRole = (Role)new NewRoleDTO
+					{
+						Name = Enum.GetName(typeof(EmployeeEnum), newEmployeeDTO.RoleSet)!
+					};
+					newRole = await _roleRepository.Create(newRole);
+				}
+				var roleToUse = getRole ?? newRole;
 
-                var createdEmployee = _employeeRepository.Create(newEmployee);
-                if(createdEmployee != null)
-                {
-                    transactions.Commit();
-                    return (EmployeeDTO)createdEmployee;
-                }else {
-                    return null;
-                }
-            }
-            catch
-            {
-                transactions.Rollback();
-                return null;
-            }
-        }
-    }
+				var newEmployee = (Employee)newEmployeeDTO;
+				//newEmployee.RoleGuid = roleToUse!.Guid;
 
-    public bool Edit(EmployeeDTO employeeDTO)
-    {
-        using(var transaction = _posDbContext.Database.BeginTransaction())
-        {
-            try
-            {
-                //get employee
-                var getEmployee = _employeeRepository.GetByGuid(employeeDTO.Guid);
-                if (getEmployee == null) return false;
+				var createdEmployee = await _employeeRepository.Create(newEmployee);
+				if (createdEmployee != null)
+				{
+					transactions.Commit();
+					return (EmployeeDTO)createdEmployee;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			catch
+			{
+				transactions.Rollback();
+				return null;
+			}
+		}
+	}
 
-                //set new employee
-                var newEmployee = (Employee)employeeDTO;
-                //newEmployee.RoleGuid = getEmployee.RoleGuid;
+	public async Task<bool> Edit(EmployeeDTO employeeDTO)
+	{
+		using (var transaction = _posDbContext.Database.BeginTransaction())
+		{
+			try
+			{
+				//get employee
+				var getEmployee = await _employeeRepository.GetById(employeeDTO.Id);
+				if (getEmployee == null) return false;
 
-                // update the employee
-                var updateEmployee = _employeeRepository.Update(newEmployee);
-                if (!updateEmployee) return false;
-                transaction.Commit();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-    }
+				//set new employee
+				var newEmployee = (Employee)employeeDTO;
+				//newEmployee.RoleGuid = getEmployee.RoleGuid;
 
-    public int Delete(Guid guid)
-    {
-        using(var transactions = _posDbContext.Database.BeginTransaction())
-        {
-            try
-            {
-                var employeeEntity = _employeeRepository.GetByGuid(guid);
-                if (employeeEntity == null) return 0;
+				// update the employee
+				var updateEmployee = await _employeeRepository.Update(newEmployee);
+				if (!updateEmployee) return false;
+				transaction.Commit();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+	}
 
-                var isDelete = _employeeRepository.Delete(employeeEntity);
-                if (isDelete == false) return 0;
-                transactions.Commit();
-                return 1;
+	public async Task<int> Delete(int id)
+	{
+		using (var transactions = _posDbContext.Database.BeginTransaction())
+		{
+			try
+			{
+				var employeeEntity = await _employeeRepository.GetById(id);
+				if (employeeEntity == null) return 0;
 
-            }
-            catch
-            {
-                transactions.Rollback();
-                return -1;
-            }
-        }
-        
-    }
+				var isDelete = await _employeeRepository.Delete(employeeEntity);
+				if (isDelete == false) return 0;
+				transactions.Commit();
+				return 1;
+
+			}
+			catch
+			{
+				transactions.Rollback();
+				return -1;
+			}
+		}
+
+	}
 }

@@ -18,9 +18,9 @@ public class TransactionController : ControllerBase
 	}
 
 	[HttpGet]
-	public IActionResult Get()
+	public async Task<IActionResult> Get()
 	{
-		var transactions = _transactionService.GetAll();
+		var transactions = await _transactionService.GetAll();
 		if (transactions == null)
 		{
 			return NotFound(new ResponseHandler<TransactionDTO>
@@ -38,10 +38,10 @@ public class TransactionController : ControllerBase
 			Data = transactions
 		});
 	}
-	[HttpGet("{guid}")]
-	public IActionResult Get(Guid guid)
+	[HttpGet("{id}")]
+	public async Task<IActionResult> Get(int id)
 	{
-		var transaction = _transactionService.GetDetailTransaction(guid);
+		var transaction = await _transactionService.GetDetailTransaction(id);
 		if (transaction == null)
 		{
 			return NotFound(new ResponseHandler<TransactionDTO>()
@@ -61,9 +61,9 @@ public class TransactionController : ControllerBase
 	}
 
 	[HttpPost("AddTransaction/")]
-	public IActionResult AddTransaction(NewTransactionDTO transactionDTO)
+	public async Task<IActionResult> AddTransaction(NewTransactionDTO transactionDTO)
 	{
-		var transaction = _transactionService.Create(transactionDTO);
+		var transaction = await _transactionService.Create(transactionDTO);
 		if (transaction == null)
 		{
 			return BadRequest(new ResponseHandler<TransactionDTO>()
@@ -83,9 +83,9 @@ public class TransactionController : ControllerBase
 	}
 
 	[HttpPut("UpdateTransaction/")]
-	public IActionResult UpdateTransaction(TransactionDTO transactionDTO)
+	public async Task<IActionResult> UpdateTransaction(TransactionDTO transactionDTO)
 	{
-		var isUpdated = _transactionService.Edit(transactionDTO);
+		var isUpdated = await _transactionService.Edit(transactionDTO);
 		switch (isUpdated)
 		{
 			case (int)HttpStatusCode.BadRequest:
@@ -112,9 +112,9 @@ public class TransactionController : ControllerBase
 	}
 
 	[HttpDelete("DeleteTransaction")]
-	public IActionResult DeleteTransaction(Guid guid)
+	public async Task<IActionResult> DeleteTransaction(int id)
 	{
-		var isDelete = _transactionService.Delete(guid);
+		var isDelete = await _transactionService.Delete(id);
 		switch (isDelete)
 		{
 			case (int)HttpStatusCode.BadRequest:

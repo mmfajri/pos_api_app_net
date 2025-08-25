@@ -16,60 +16,61 @@ public class ProductService
         _posDbContext = posDbContext;
     }
 
-    public IEnumerable<ProductDTO>? Get()
+    public async Task<IEnumerable<ProductDTO>?> Get()
     {
-        var list = _productRepository.GetAll();
+        var list = await _productRepository.GetAll();
         if (list == null || !list.Any()) return null;
 
-        var dto=list.Select(product => (ProductDTO)product);
+        var dto = list.Select(product => (ProductDTO)product);
         return dto;
     }
 
-    public ProductDTO? Get(string barcodeID)
+    public async Task<ProductDTO?> Get(string barcodeID)
     {
-        var product = _productRepository.GetByBarcode(barcodeID);
+        var product = await _productRepository.GetByBarcode(barcodeID);
         if (product == null) return null;
 
         var dto = (ProductDTO)product;
         return dto;
     }
 
-    public ProductDTO? Get(Guid guid)
+    public async Task<ProductDTO?> Get(int id)
     {
-        var product = _productRepository.GetByGuid(guid);
+        var product = await _productRepository.GetById(id);
         if (product == null) return null;
-        
+
         var dto = (ProductDTO)product;
         return dto;
     }
 
-    public int Delete(Guid guid)
+    public async Task<int> Delete(int id)
     {
-        var getEntity = _productRepository.GetByGuid(guid);
+        var getEntity = await _productRepository.GetById(id);
         if (getEntity == null) return -1;
 
-        var delete = _productRepository.Delete(getEntity);
+        var delete = await _productRepository.Delete(getEntity);
         if (!delete) return 0;
 
         return 1;
     }
 
-    public int Edit(ProductDTO product)
+    public async Task<int> Edit(ProductDTO product)
     {
-        using(var transaction = _posDbContext.Database.BeginTransaction())
+        using (var transaction = _posDbContext.Database.BeginTransaction())
         {
             try
             {
-                var IsExits = _productRepository.IsExits(product.Guid);
-                if(!IsExits) return -1;
+                var IsExits = await _productRepository.IsExits(product.Id);
+                if (!IsExits) return -1;
 
-                var edit = _productRepository.Update((Product)product);
-                if(!edit) return 0;
+                var edit = await _productRepository.Update((Product)product);
+                if (!edit) return 0;
 
                 transaction.Commit();
                 return 1;
 
-            }catch
+            }
+            catch
             {
                 transaction.Rollback();
                 return 0;
@@ -77,20 +78,20 @@ public class ProductService
         }
     }
 
-    public int Create(NewProductDTO newProductDTO)
+    public async Task<int> Create(NewProductDTO newProductDTO)
     {
-        using(var transactions = _posDbContext.Database.BeginTransaction())
+        using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
         {
             try
             {
-                var created = _productRepository.Create((Product)newProductDTO);
+                var created = await _productRepository.Create((Product)newProductDTO);
                 if (created == null) return 0;
                 transactions.Commit();
                 return 1;
             }
             catch
             {
-                transactions.Rollback();
+                transactions.RollbackAsync();
                 return 1;
             }
         }

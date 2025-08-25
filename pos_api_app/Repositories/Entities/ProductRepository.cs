@@ -1,4 +1,5 @@
-﻿using pos_api_app.Contracts.Repositories.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
 using pos_api_app.Models.Entities;
 using pos_api_app.Models.Entities;
@@ -12,18 +13,18 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
     {
     }
 
-    public Product? GetByBarcode(string barcode)
+    public async Task<Product?> GetByBarcode(string barcode)
     {
-        return _posDbContext.Set<Product>().FirstOrDefault(product => product.BarcodeID == barcode);
+        return await _posDbContext.Set<Product>().Where(product => product.BarcodeID == barcode).FirstOrDefaultAsync();
     }
 
-    public bool UniqueBarcode(string barcode)
+    public async Task<bool> UniqueBarcode(string barcode)
     {
-        return _posDbContext.Set<Product>().Any(product => product.BarcodeID == barcode);
+        return await _posDbContext.Set<Product>().AnyAsync(product => product.BarcodeID == barcode);
     }
 
-    public bool IsProductExist(int id)
+    public async Task<bool> IsProductExist(int id)
     {
-        return _posDbContext.Set<Product>().Any(product => product.Id == id);
+        return await _posDbContext.Set<Product>().AnyAsync(product => product.Id == id);
     }
 }

@@ -5,5 +5,5 @@ namespace pos_api_app.Contracts.Repositories.Entities;
 
 public interface IRoleRepository : IGeneralRepository<Role>
 {
-    Role? GetByName(string name);
+    Task<Role?> GetByName(string name);
 }

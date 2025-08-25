@@ -1,4 +1,5 @@
-﻿using pos_api_app.Contracts.Repositories.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
 using pos_api_app.Models.Entities;
 using pos_api_app.Models.Entities;
@@ -11,8 +12,8 @@ public class TransactionItemRepository : GeneralRepository<TransactionItem>, ITr
     {
     }
 
-    public IEnumerable<TransactionItem>? GetByTransactionsId(int id)
+    public async Task<IEnumerable<TransactionItem>?> GetByTransactionsId(int id)
     {
-        return _posDbContext.Set<TransactionItem>().Where(x => x.TransactionId == id);
+        return await _posDbContext.Set<TransactionItem>().Where(x => x.TransactionId == id).ToListAsync();
     }
 }

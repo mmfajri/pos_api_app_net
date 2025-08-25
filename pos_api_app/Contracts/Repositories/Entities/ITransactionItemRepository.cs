@@ -5,6 +5,6 @@ namespace pos_api_app.Contracts.Repositories.Entities
 {
     public interface ITransactionItemRepository : IGeneralRepository<TransactionItem>
     {
-        IEnumerable<TransactionItem>? GetByTransactionsId(int id);
+        Task<IEnumerable<TransactionItem>?> GetByTransactionsId(int id);
     }
 }
