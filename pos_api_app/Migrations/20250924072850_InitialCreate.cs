@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace pos_api_app.Migrations
 {
     /// <inheritdoc />
-    public partial class InitializedMigrations : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,7 +16,8 @@ namespace pos_api_app.Migrations
                 name: "tb_m_product",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     barcode_id = table.Column<string>(type: "varchar(255)", nullable: false),
                     title = table.Column<string>(type: "varchar(150)", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -24,14 +26,15 @@ namespace pos_api_app.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_product", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_product", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_m_role",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     name = table.Column<string>(type: "varchar(50)", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -39,14 +42,15 @@ namespace pos_api_app.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_role", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_role", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_m_unit",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -54,38 +58,40 @@ namespace pos_api_app.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_unit", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_unit", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_m_account",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     username = table.Column<string>(type: "varchar(100)", nullable: false),
                     password = table.Column<string>(type: "varchar(200)", nullable: false),
-                    role_guid = table.Column<Guid>(type: "uuid", nullable: true),
+                    role_id = table.Column<int>(type: "integer", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_account", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_account", x => x.id);
                     table.ForeignKey(
-                        name: "FK_tb_m_account_tb_m_role_role_guid",
-                        column: x => x.role_guid,
+                        name: "FK_tb_m_account_tb_m_role_role_id",
+                        column: x => x.role_id,
                         principalTable: "tb_m_role",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_tr_price",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    product_guid = table.Column<Guid>(type: "uuid", nullable: true),
-                    price_guid = table.Column<Guid>(type: "uuid", nullable: true),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    product_id = table.Column<int>(type: "integer", nullable: true),
+                    unit_id = table.Column<int>(type: "integer", nullable: true),
                     amount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -93,83 +99,86 @@ namespace pos_api_app.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_tr_price", x => x.guid);
+                    table.PrimaryKey("PK_tb_tr_price", x => x.id);
                     table.ForeignKey(
-                        name: "FK_tb_tr_price_tb_m_product_product_guid",
-                        column: x => x.product_guid,
+                        name: "FK_tb_tr_price_tb_m_product_product_id",
+                        column: x => x.product_id,
                         principalTable: "tb_m_product",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_tb_tr_price_tb_m_unit_price_guid",
-                        column: x => x.price_guid,
+                        name: "FK_tb_tr_price_tb_m_unit_unit_id",
+                        column: x => x.unit_id,
                         principalTable: "tb_m_unit",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_m_employee",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     firstname = table.Column<string>(type: "varchar(200)", nullable: false),
                     lastname = table.Column<string>(type: "varchar(200)", nullable: true),
-                    account_guid = table.Column<Guid>(type: "uuid", nullable: true),
-                    RoleGuid = table.Column<Guid>(type: "uuid", nullable: true),
+                    account_id = table.Column<int>(type: "integer", nullable: true),
+                    RoleId = table.Column<int>(type: "integer", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_employee", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_employee", x => x.id);
                     table.ForeignKey(
-                        name: "FK_tb_m_employee_tb_m_account_account_guid",
-                        column: x => x.account_guid,
+                        name: "FK_tb_m_employee_tb_m_account_account_id",
+                        column: x => x.account_id,
                         principalTable: "tb_m_account",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_tb_m_employee_tb_m_role_RoleGuid",
-                        column: x => x.RoleGuid,
+                        name: "FK_tb_m_employee_tb_m_role_RoleId",
+                        column: x => x.RoleId,
                         principalTable: "tb_m_role",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_tr_transaction",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    employee_guid = table.Column<Guid>(type: "uuid", nullable: true),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    account_id = table.Column<int>(type: "integer", nullable: true),
                     transaction_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     total_ammount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
-                    AccountGuid = table.Column<Guid>(type: "uuid", nullable: true),
+                    EmployeeId = table.Column<int>(type: "integer", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_tr_transaction", x => x.guid);
+                    table.PrimaryKey("PK_tb_tr_transaction", x => x.id);
                     table.ForeignKey(
-                        name: "FK_tb_tr_transaction_tb_m_account_AccountGuid",
-                        column: x => x.AccountGuid,
+                        name: "FK_tb_tr_transaction_tb_m_account_account_id",
+                        column: x => x.account_id,
                         principalTable: "tb_m_account",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_tb_tr_transaction_tb_m_employee_employee_guid",
-                        column: x => x.employee_guid,
+                        name: "FK_tb_tr_transaction_tb_m_employee_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "tb_m_employee",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "tb_m_transaction_item",
                 columns: table => new
                 {
-                    guid = table.Column<Guid>(type: "uuid", nullable: false),
-                    transaction_guid = table.Column<Guid>(type: "uuid", nullable: true),
-                    product_guid = table.Column<Guid>(type: "uuid", nullable: true),
-                    price_guid = table.Column<Guid>(type: "uuid", nullable: true),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    transaction_id = table.Column<int>(type: "integer", nullable: true),
+                    product_id = table.Column<int>(type: "integer", nullable: true),
+                    price_id = table.Column<int>(type: "integer", nullable: true),
                     quantity = table.Column<float>(type: "real", nullable: false),
                     subtotal = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -178,28 +187,28 @@ namespace pos_api_app.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_tb_m_transaction_item", x => x.guid);
+                    table.PrimaryKey("PK_tb_m_transaction_item", x => x.id);
                     table.ForeignKey(
-                        name: "FK_tb_m_transaction_item_tb_m_product_product_guid",
-                        column: x => x.product_guid,
+                        name: "FK_tb_m_transaction_item_tb_m_product_product_id",
+                        column: x => x.product_id,
                         principalTable: "tb_m_product",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_tb_m_transaction_item_tb_tr_price_price_guid",
-                        column: x => x.price_guid,
+                        name: "FK_tb_m_transaction_item_tb_tr_price_price_id",
+                        column: x => x.price_id,
                         principalTable: "tb_tr_price",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_tb_m_transaction_item_tb_tr_transaction_transaction_guid",
-                        column: x => x.transaction_guid,
+                        name: "FK_tb_m_transaction_item_tb_tr_transaction_transaction_id",
+                        column: x => x.transaction_id,
                         principalTable: "tb_tr_transaction",
-                        principalColumn: "guid");
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_account_role_guid",
+                name: "IX_tb_m_account_role_id",
                 table: "tb_m_account",
-                column: "role_guid");
+                column: "role_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_tb_m_account_username",
@@ -208,50 +217,50 @@ namespace pos_api_app.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_employee_account_guid",
+                name: "IX_tb_m_employee_account_id",
                 table: "tb_m_employee",
-                column: "account_guid",
+                column: "account_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_employee_RoleGuid",
+                name: "IX_tb_m_employee_RoleId",
                 table: "tb_m_employee",
-                column: "RoleGuid");
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_transaction_item_price_guid",
+                name: "IX_tb_m_transaction_item_price_id",
                 table: "tb_m_transaction_item",
-                column: "price_guid");
+                column: "price_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_transaction_item_product_guid",
+                name: "IX_tb_m_transaction_item_product_id",
                 table: "tb_m_transaction_item",
-                column: "product_guid");
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_m_transaction_item_transaction_guid",
+                name: "IX_tb_m_transaction_item_transaction_id",
                 table: "tb_m_transaction_item",
-                column: "transaction_guid");
+                column: "transaction_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_tr_price_price_guid",
+                name: "IX_tb_tr_price_product_id",
                 table: "tb_tr_price",
-                column: "price_guid");
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_tr_price_product_guid",
+                name: "IX_tb_tr_price_unit_id",
                 table: "tb_tr_price",
-                column: "product_guid");
+                column: "unit_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_tr_transaction_AccountGuid",
+                name: "IX_tb_tr_transaction_account_id",
                 table: "tb_tr_transaction",
-                column: "AccountGuid");
+                column: "account_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tb_tr_transaction_employee_guid",
+                name: "IX_tb_tr_transaction_EmployeeId",
                 table: "tb_tr_transaction",
-                column: "employee_guid");
+                column: "EmployeeId");
         }
 
         /// <inheritdoc />

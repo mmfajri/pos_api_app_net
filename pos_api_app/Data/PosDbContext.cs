@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using pos_api_app.Utilities;
 
 namespace pos_api_app.Data;
 
@@ -16,6 +17,18 @@ public class PosDbContext : DbContext
 	public DbSet<Transaction> Transactions { get; set; }
 	public DbSet<TransactionItem> TransactionItems { get; set; }
 	public DbSet<Unit> Units { get; set; }
+
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		if (!optionsBuilder.IsConfigured)
+		{
+			string? connectionString = GetConfig.AppSetting["ConnectionStrings:DefaultConnection"];
+			if (string.IsNullOrEmpty(connectionString)) return;
+
+			optionsBuilder.UseNpgsql(connectionString);
+		}
+		base.OnConfiguring(optionsBuilder);
+	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

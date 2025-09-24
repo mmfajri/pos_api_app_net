@@ -12,8 +12,8 @@ using pos_api_app.Data;
 namespace pos_api_app.Migrations
 {
     [DbContext(typeof(PosDbContext))]
-    [Migration("20250819024033_InitializedMigrations")]
-    partial class InitializedMigrations
+    [Migration("20250924072850_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,10 +27,12 @@ namespace pos_api_app.Migrations
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Account", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedTime")
                         .HasColumnType("timestamp with time zone")
@@ -45,9 +47,9 @@ namespace pos_api_app.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("password");
 
-                    b.Property<Guid?>("RoleGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_guid");
+                    b.Property<int?>("RoleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("timestamp with time zone")
@@ -58,9 +60,9 @@ namespace pos_api_app.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("username");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
-                    b.HasIndex("RoleGuid");
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -70,14 +72,16 @@ namespace pos_api_app.Migrations
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Employee", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    b.Property<Guid?>("AccountGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("account_guid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("account_id");
 
                     b.Property<DateTime?>("CreatedTime")
                         .HasColumnType("timestamp with time zone")
@@ -96,29 +100,31 @@ namespace pos_api_app.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("lastname");
 
-                    b.Property<Guid?>("RoleGuid")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("RoleId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
-                    b.HasIndex("AccountGuid")
+                    b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.HasIndex("RoleGuid");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("tb_m_employee");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Price", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)")
@@ -132,33 +138,35 @@ namespace pos_api_app.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
-                    b.Property<Guid?>("ProductGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_guid");
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
 
-                    b.Property<Guid?>("UnitGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("price_guid");
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("integer")
+                        .HasColumnName("unit_id");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ProductGuid");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex("UnitGuid");
+                    b.HasIndex("UnitId");
 
                     b.ToTable("tb_tr_price");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Product", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BarcodeID")
                         .IsRequired()
@@ -182,17 +190,19 @@ namespace pos_api_app.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
                     b.ToTable("tb_m_product");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Role", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedTime")
                         .HasColumnType("timestamp with time zone")
@@ -211,28 +221,30 @@ namespace pos_api_app.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
                     b.ToTable("tb_m_role");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Transaction", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    b.Property<Guid?>("AccountGuid")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("account_id");
 
                     b.Property<DateTime?>("CreatedTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_time");
 
-                    b.Property<Guid?>("EmployeeGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("employee_guid");
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("integer");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean")
@@ -250,21 +262,23 @@ namespace pos_api_app.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
-                    b.HasIndex("AccountGuid");
+                    b.HasIndex("AccountId");
 
-                    b.HasIndex("EmployeeGuid");
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("tb_tr_transaction");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.TransactionItem", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedTime")
                         .HasColumnType("timestamp with time zone")
@@ -274,13 +288,13 @@ namespace pos_api_app.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
-                    b.Property<Guid?>("PriceGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("price_guid");
+                    b.Property<int?>("PriceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("price_id");
 
-                    b.Property<Guid?>("ProductGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_guid");
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
 
                     b.Property<float>("Quantity")
                         .HasColumnType("real")
@@ -290,31 +304,33 @@ namespace pos_api_app.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("subtotal");
 
-                    b.Property<Guid?>("TransactionGuid")
-                        .HasColumnType("uuid")
-                        .HasColumnName("transaction_guid");
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("transaction_id");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
-                    b.HasIndex("PriceGuid");
+                    b.HasIndex("PriceId");
 
-                    b.HasIndex("ProductGuid");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex("TransactionGuid");
+                    b.HasIndex("TransactionId");
 
                     b.ToTable("tb_m_transaction_item");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Unit", b =>
                 {
-                    b.Property<Guid>("Guid")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("guid");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedTime")
                         .HasColumnType("timestamp with time zone")
@@ -332,7 +348,7 @@ namespace pos_api_app.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_time");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
                     b.ToTable("tb_m_unit");
                 });
@@ -341,7 +357,7 @@ namespace pos_api_app.Migrations
                 {
                     b.HasOne("pos_api_app.Models.Entities.Role", "Role")
                         .WithMany("Accounts")
-                        .HasForeignKey("RoleGuid");
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });
@@ -350,11 +366,11 @@ namespace pos_api_app.Migrations
                 {
                     b.HasOne("pos_api_app.Models.Entities.Account", "Account")
                         .WithOne("Employee")
-                        .HasForeignKey("pos_api_app.Models.Entities.Employee", "AccountGuid");
+                        .HasForeignKey("pos_api_app.Models.Entities.Employee", "AccountId");
 
                     b.HasOne("pos_api_app.Models.Entities.Role", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleGuid");
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Account");
 
@@ -365,11 +381,11 @@ namespace pos_api_app.Migrations
                 {
                     b.HasOne("pos_api_app.Models.Entities.Product", "Product")
                         .WithMany("Prices")
-                        .HasForeignKey("ProductGuid");
+                        .HasForeignKey("ProductId");
 
                     b.HasOne("pos_api_app.Models.Entities.Unit", "Unit")
                         .WithMany("Prices")
-                        .HasForeignKey("UnitGuid");
+                        .HasForeignKey("UnitId");
 
                     b.Navigation("Product");
 
@@ -378,30 +394,30 @@ namespace pos_api_app.Migrations
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Transaction", b =>
                 {
-                    b.HasOne("pos_api_app.Models.Entities.Account", null)
+                    b.HasOne("pos_api_app.Models.Entities.Account", "Account")
                         .WithMany("Transactions")
-                        .HasForeignKey("AccountGuid");
+                        .HasForeignKey("AccountId");
 
-                    b.HasOne("pos_api_app.Models.Entities.Employee", "Employee")
+                    b.HasOne("pos_api_app.Models.Entities.Employee", null)
                         .WithMany("Transactions")
-                        .HasForeignKey("EmployeeGuid");
+                        .HasForeignKey("EmployeeId");
 
-                    b.Navigation("Employee");
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.TransactionItem", b =>
                 {
                     b.HasOne("pos_api_app.Models.Entities.Price", "Price")
                         .WithMany("TransactionItems")
-                        .HasForeignKey("PriceGuid");
+                        .HasForeignKey("PriceId");
 
                     b.HasOne("pos_api_app.Models.Entities.Product", "Product")
                         .WithMany("TransactionItems")
-                        .HasForeignKey("ProductGuid");
+                        .HasForeignKey("ProductId");
 
                     b.HasOne("pos_api_app.Models.Entities.Transaction", "Transaction")
                         .WithMany("TransactionItems")
-                        .HasForeignKey("TransactionGuid");
+                        .HasForeignKey("TransactionId");
 
                     b.Navigation("Price");
 

@@ -1,21 +1,23 @@
-using FluentValidation;
+// using FluentValidation;
 using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Contracts.Utilities;
 using pos_api_app.Data;
 using pos_api_app.Repository.Entities;
 using pos_api_app.Services;
-using pos_api_app.Utilities.Handlers;
+// using pos_api_app.Utilities.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
+// using System.Reflection;
 using System.Text;
 using TokenHandler = pos_api_app.Utilities.Handlers.TokenHandler;
+using pos_api_app.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<PosDbContext>(option => option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<PosDbContext>(option => option.UseNpgsql(GetConfig.AppSetting["ConnectionStrings:DefaultConnection"] ?? string.Empty));
+builder.WebHost.UseUrls(GetConfig.AppSetting["URL_HOST"] ?? string.Empty);
 
 // Add services to the container.
 builder.Services.AddControllers();

@@ -24,7 +24,7 @@ public class AuthService
 		var response = new ResponseDTO<bool>();
 
 		// Check if the Username Exist in the database
-		var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username);
+		var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username ?? string.Empty);
 		if (isUsernameExist)
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
@@ -33,9 +33,19 @@ public class AuthService
 		}
 
 		// Save it to the Database
-		var isSuccess = await _accountRepository.Create((Account)req);
+		var model = (Account)req;
+		model.IsDeleted = false;
+		model.CreatedTime = DateTime.Now;
+		var isSuccess = await _accountRepository.Create(model);
+		if (isSuccess is null)
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = "Invalid Credential Username";
+			return response;
+		}
 
-
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = "Success";
 		return response;
 	}
 
