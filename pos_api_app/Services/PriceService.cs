@@ -4,7 +4,6 @@ using pos_api_app.DTOs.PriceDTO;
 using pos_api_app.DTOs.ProductDTO;
 using pos_api_app.DTOs.UnitDTO;
 using pos_api_app.Models.Entities;
-using pos_api_app.Models.Entities;
 
 namespace pos_api_app.Services;
 

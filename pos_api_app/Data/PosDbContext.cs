@@ -22,9 +22,10 @@ public class PosDbContext : DbContext
 	{
 		if (!optionsBuilder.IsConfigured)
 		{
+#nullable enable
 			string? connectionString = GetConfig.AppSetting["ConnectionStrings:DefaultConnection"];
-			if (string.IsNullOrEmpty(connectionString)) return;
 
+			if (string.IsNullOrEmpty(connectionString)) return;
 			optionsBuilder.UseNpgsql(connectionString);
 		}
 		base.OnConfiguring(optionsBuilder);

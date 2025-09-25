@@ -111,12 +111,12 @@ builder.Services.AddSwaggerGen(x =>
 var app = builder.Build();
 
 // Auto Migrate
-using (var scope = app.Services.CreateScope())
-{
-	var dbContext = scope.ServiceProvider.GetRequiredService<PosDbContext>();
-	// await dbContext.Database.EnsureCreatedAsync();
-	await dbContext.Database.MigrateAsync();
-}
+// using (var scope = app.Services.CreateScope())
+// {
+// 	var dbContext = scope.ServiceProvider.GetRequiredService<PosDbContext>();
+// 	// await dbContext.Database.EnsureCreatedAsync();
+// 	await dbContext.Database.MigrateAsync();
+// }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

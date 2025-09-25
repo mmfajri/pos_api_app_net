@@ -6,6 +6,7 @@ public class RegisterDTO
 {
 	public string? Username { get; set; }
 	public string? Password { get; set; }
+	public string? Email { get; set; }
 
 	public static explicit operator Account(RegisterDTO registerDTO)
 	{
@@ -13,6 +14,7 @@ public class RegisterDTO
 		{
 			UserName = registerDTO.Username ?? null,
 			Password = registerDTO.Password ?? null,
+			Email = registerDTO.Email ?? null
 		};
 
 	}
