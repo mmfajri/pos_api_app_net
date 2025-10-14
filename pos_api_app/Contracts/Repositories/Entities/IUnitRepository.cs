@@ -5,5 +5,5 @@ namespace pos_api_app.Contracts.Repositories.Entities;
 
 public interface IUnitRepository : IGeneralRepository<Unit>
 {
-    Unit? GetByName(string name);
+	Task<Unit?> GetByName(string name);
 }
