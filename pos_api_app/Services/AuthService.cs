@@ -4,6 +4,7 @@ using pos_api_app.Models.Entities;
 using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.DTOs.AuthDTO;
+using pos_api_app.Utilities;
 using System.Net;
 
 namespace pos_api_app.Services;
@@ -45,13 +46,21 @@ public class AuthService
 		}
 
 		response.StatusCode = StatusCodes.Status200OK;
-		response.Message = "Success";
+		response.Message = StaticValue.ResponseMessage.Success;
 		return response;
 	}
 
 	public async Task<ResponseDTO<AuthDTO>> Login(LoginDTO req)
 	{
 		var response = new ResponseDTO<AuthDTO>();
+
+		//Validate Request
+		if (string.IsNullOrEmpty(req.Username))
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = "User Not Found";
+			return response;
+		}
 
 		// Get Username
 		var dataUser = await _accountRepository.GetAccountByUsername(req.Username);
@@ -71,7 +80,8 @@ public class AuthService
 		}
 
 		// Generate Token JWT
-
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
 		return response;
 
 	}
