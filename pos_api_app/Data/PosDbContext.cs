@@ -2,6 +2,7 @@
 using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using pos_api_app.Utilities;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace pos_api_app.Data;
 
@@ -100,4 +101,5 @@ public class PosDbContext : DbContext
 		//     .HasForeignKey(TransactionItem => TransactionItem.PriceGuid)
 		//     .OnDelete(DeleteBehavior.SetNull);
 	}
+
 }

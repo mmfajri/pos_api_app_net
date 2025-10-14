@@ -38,6 +38,7 @@ builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<PriceService>();
 builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<AuthService>();
 
 //Add Fluent Validation Setting
 

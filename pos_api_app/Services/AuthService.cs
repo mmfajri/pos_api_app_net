@@ -35,7 +35,7 @@ public class AuthService
 		// Save it to the Database
 		var model = (Account)req;
 		model.IsDeleted = false;
-		model.CreatedTime = DateTime.Now;
+		model.CreatedTime = DateTime.UtcNow;
 		var isSuccess = await _accountRepository.Create(model);
 		if (isSuccess is null)
 		{
