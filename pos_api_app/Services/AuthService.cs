@@ -58,24 +58,23 @@ public class AuthService
 		if (string.IsNullOrEmpty(req.Username))
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = "User Not Found";
+			response.Message = "Username is empty";
 			return response;
 		}
 
 		// Get Username
 		var dataUser = await _accountRepository.GetAccountByUsername(req.Username);
-
 		if (dataUser is null)
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = "User Not Found";
+			response.Message = StaticValue.ResponseMessage.InvalidCredentialUser;
 			return response;
 		}
 
-		if (dataUser.Password != req.Password)
+		if (!Hashing.ValidatePassword(req.Password!, dataUser.Password!))
 		{
 			response.StatusCode = StatusCodes.Status403Forbidden;
-			response.Message = "Invalid Credential Username";
+			response.Message = StaticValue.ResponseMessage.InvalidCredentialUser;
 			return response;
 		}
 

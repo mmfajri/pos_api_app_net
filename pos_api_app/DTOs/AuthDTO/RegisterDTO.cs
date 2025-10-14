@@ -1,4 +1,5 @@
 using pos_api_app.Models.Entities;
+using pos_api_app.Utilities;
 
 namespace pos_api_app.DTOs.AuthDTO;
 
@@ -13,7 +14,7 @@ public class RegisterDTO
 		return new Account
 		{
 			UserName = registerDTO.Username ?? null,
-			Password = registerDTO.Password ?? null,
+			Password = Hashing.HashPassword(registerDTO.Password ?? string.Empty),
 			Email = registerDTO.Email ?? null
 		};
 
