@@ -58,27 +58,27 @@ public class PriceController : ControllerBase
 		});
 	}
 
-	[HttpPost("AddPrice/")]
-	public async Task<IActionResult> AddPrice(NewPriceDTO newPriceDTO)
-	{
-		var created = await _priceService.Create(newPriceDTO);
-		if (created != null)
-		{
-			return Ok(new ResponseHandler<PriceDTO>
-			{
-				Code = StatusCodes.Status200OK,
-				Status = HttpStatusCode.OK.ToString(),
-				Message = "Successfully Created",
-				Data = created
-			});
-		}
-		return NotFound(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data Failed to created"
-		});
-	}
+	// [HttpPost("AddPrice/")]
+	// public async Task<IActionResult> AddPrice(NewPriceDTO newPriceDTO)
+	// {
+	// 	var created = await _priceService.Create(newPriceDTO);
+	// 	if (created != null)
+	// 	{
+	// 		return Ok(new ResponseHandler<PriceDTO>
+	// 		{
+	// 			Code = StatusCodes.Status200OK,
+	// 			Status = HttpStatusCode.OK.ToString(),
+	// 			Message = "Successfully Created",
+	// 			Data = created
+	// 		});
+	// 	}
+	// 	return NotFound(new ResponseHandler<ProductDTO>
+	// 	{
+	// 		Code = StatusCodes.Status404NotFound,
+	// 		Status = HttpStatusCode.NotFound.ToString(),
+	// 		Message = "Data Failed to created"
+	// 	});
+	// }
 
 	[HttpPut("UpdatePrice/")]
 	public async Task<IActionResult> UpdatePrice(PriceDTO price)

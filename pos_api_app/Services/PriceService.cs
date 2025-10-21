@@ -40,48 +40,48 @@ public class PriceService
 		return dto;
 	}
 
-	public async Task<PriceDTO?> Create(NewPriceDTO newPriceDTO)
-	{
-		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
-		{
-			try
-			{
-				//check if the product is exist
-				var isProductExist = await _productRepository.IsExits((int)newPriceDTO.ProductId);
-				if (!isProductExist)
-				{
-					return null;
-				}
-
-				//check existing unit price
-				var getUnit = _unitRepository.GetByName(newPriceDTO.UnitName);
-				Unit? newUnit = null;
-				if (getUnit == null)
-				{
-					newUnit = (Unit)new NewUnitDTO
-					{
-						Name = newPriceDTO.UnitName,
-					};
-					var createdUnit = _unitRepository.Create(newUnit);
-					if (createdUnit == null) return null;
-				}
-				var unitToUse = getUnit ?? newUnit;
-
-				var newPrice = (Price)newPriceDTO;
-				newPrice.UnitId = unitToUse!.Id;
-
-				var createdPrice = await _priceRepository.Create(newPrice);
-				if (createdPrice == null) return null;
-				transactions.Commit();
-				return (PriceDTO)createdPrice;
-			}
-			catch
-			{
-				transactions.Rollback();
-				return null;
-			}
-		}
-	}
+	// public async Task<PriceDTO?> Create(NewPriceDTO newPriceDTO)
+	// {
+	// 	using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+	// 	{
+	// 		try
+	// 		{
+	// 			//check if the product is exist
+	// 			var isProductExist = await _productRepository.IsExits((int)newPriceDTO.ProductId);
+	// 			if (!isProductExist)
+	// 			{
+	// 				return null;
+	// 			}
+	//
+	// 			//check existing unit price
+	// 			var getUnit = _unitRepository.GetByName(newPriceDTO.UnitName);
+	// 			Unit? newUnit = null;
+	// 			if (getUnit == null)
+	// 			{
+	// 				newUnit = (Unit)new NewUnitDTO
+	// 				{
+	// 					Name = newPriceDTO.UnitName,
+	// 				};
+	// 				var createdUnit = _unitRepository.Create(newUnit);
+	// 				if (createdUnit == null) return null;
+	// 			}
+	// 			var unitToUse = getUnit is not null ? getUnit : newUnit;
+	//
+	// 			var newPrice = (Price)newPriceDTO;
+	// 			newPrice.UnitId = unitToUse!.Id;
+	//
+	// 			var createdPrice = await _priceRepository.Create(newPrice);
+	// 			if (createdPrice == null) return null;
+	// 			transactions.Commit();
+	// 			return (PriceDTO)createdPrice;
+	// 		}
+	// 		catch
+	// 		{
+	// 			transactions.Rollback();
+	// 			return null;
+	// 		}
+	// 	}
+	// }
 
 	public async Task<bool> Edit(PriceDTO priceDto)
 	{
