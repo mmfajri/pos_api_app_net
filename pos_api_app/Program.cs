@@ -25,7 +25,6 @@ builder.Services.AddControllers();
 //Add Repository
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<IPriceRepository, PriceRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -36,7 +35,6 @@ builder.Services.AddScoped<IUnitRepository, UnitRepository>();
 builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<PriceService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<AuthService>();
 
