@@ -7,5 +7,6 @@ public class StaticValue
 		public readonly static string Success = "Success";
 		public readonly static string ErrorSystem = "Error System";
 		public readonly static string InvalidCredentialUser = "Invalid Credential System";
+		public readonly static string DataNotFound = "Data Not Found";
 	}
 }

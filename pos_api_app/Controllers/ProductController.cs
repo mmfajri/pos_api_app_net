@@ -4,6 +4,8 @@ using pos_api_app.Utilities.Handlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Diagnostics.CodeAnalysis;
 
 namespace pos_api_app.Controllers;
 
@@ -18,44 +20,30 @@ public class ProductController : ControllerBase
 		_productService = productService;
 	}
 
+
 	[HttpGet]
-	public async Task<IActionResult> Get()
+	public async Task<IActionResult> Get([FromQuery] string? barcodeID = "")
 	{
-		var list = await _productService.Get();
-		if (list == null) return NotFound(new ResponseHandler<ProductDTO>
+		var response = await _productService.Get(barcodeID);
+		switch (response.StatusCode)
 		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data Not Found"
-		});
-
-		return Ok(new ResponseHandler<IEnumerable<ProductDTO>>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Data Found",
-			Data = list
-		});
-	}
-
-	[HttpGet("Barcode/{barcodeID}")]
-	public async Task<IActionResult> Get(string barcodeID)
-	{
-		var product = await _productService.Get(barcodeID);
-		if (product == null) return NotFound(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data not found"
-		});
-
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Data Found",
-			Data = product
-		});
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, response);
+				}
+		}
 	}
 
 	[HttpGet("{id}/")]

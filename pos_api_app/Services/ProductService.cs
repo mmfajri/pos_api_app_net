@@ -22,22 +22,30 @@ public class ProductService
 		_posDbContext = posDbContext;
 	}
 
-	public async Task<IEnumerable<ProductDTO>?> Get()
+	public async Task<ResponseDTO<List<ProductDTO>?>> Get(string? barcodeID = "")
 	{
-		var list = await _productRepository.GetAll();
-		if (list == null || !list.Any()) return null;
+		var response = new ResponseDTO<List<ProductDTO>?>();
+		try
+		{
+			var data = await _productRepository.GetProduct(barcodeID);
+			if (data is null || data.Count == 0)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				return response;
+			}
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = data;
+			return response;
+		}
+		catch
+		{
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
 
-		var dto = list.Select(product => (ProductDTO)product);
-		return dto;
-	}
-
-	public async Task<ProductDTO?> Get(string barcodeID)
-	{
-		var product = await _productRepository.GetByBarcode(barcodeID);
-		if (product == null) return null;
-
-		var dto = (ProductDTO)product;
-		return dto;
 	}
 
 	public async Task<ProductDTO?> Get(int id)

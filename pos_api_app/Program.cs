@@ -29,6 +29,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
+builder.Services.AddScoped<IPriceRepository, PriceRepository>();
 builder.Services.AddScoped<IUnitRepository, UnitRepository>();
 
 //Add Services
