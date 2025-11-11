@@ -34,7 +34,7 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		var connection = _posDbContext.Database.GetDbConnection();
 
 		var parameters = new DynamicParameters();
-		var query = @"SELECT product.barcode_id BARCODE_ID, product.title TITLE, unit.Name UNIT, price.amount PRICE 
+		var query = @"SELECT product.barcode_id BarcodeId, product.title TITLE, unit.Name UNIT, price.amount Amount 
                   FROM tb_tr_price price
                   JOIN tb_m_product product on price.product_id = product.id
                   JOIN tb_m_unit unit on price.unit_id = unit.id 
