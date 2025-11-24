@@ -24,30 +24,41 @@ public class AuthService
 	{
 		var response = new ResponseDTO<bool>();
 
-		// Check if the Username Exist in the database
-		var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username ?? string.Empty);
-		if (isUsernameExist)
+		try
 		{
-			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = "Invalid Credential Username";
+			// Check if the Username Exist in the database
+			var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username ?? string.Empty);
+			if (isUsernameExist)
+			{
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = "Invalid Credential Username";
+				return response;
+			}
+
+			// Save it to the Database
+			var model = (Account)req;
+			model.IsDeleted = false;
+			model.CreatedTime = DateTime.UtcNow;
+			var isSuccess = await _accountRepository.Create(model);
+			if (isSuccess is null)
+			{
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = "Invalid Credential Username";
+				return response;
+			}
+
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = true;
 			return response;
 		}
-
-		// Save it to the Database
-		var model = (Account)req;
-		model.IsDeleted = false;
-		model.CreatedTime = DateTime.UtcNow;
-		var isSuccess = await _accountRepository.Create(model);
-		if (isSuccess is null)
+		catch
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = "Invalid Credential Username";
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			response.Data = false;
 			return response;
 		}
-
-		response.StatusCode = StatusCodes.Status200OK;
-		response.Message = StaticValue.ResponseMessage.Success;
-		return response;
 	}
 
 	public async Task<ResponseDTO<AuthDTO>> Login(LoginDTO req)
