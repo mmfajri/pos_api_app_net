@@ -19,8 +19,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<PosDbContext>(option => option.UseNpgsql(GetConfig.AppSetting["ConnectionStrings:DefaultConnection"] ?? string.Empty));
 builder.WebHost.UseUrls(GetConfig.AppSetting["URL_HOST"] ?? string.Empty);
 
-// Add services to the container.
-builder.Services.AddControllers();
 
 //Add Repository
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -38,6 +36,10 @@ builder.Services.AddScoped<RoleService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UnitService>();
+
+// Add services to the container.
+builder.Services.AddControllers();
 
 //Add Fluent Validation Setting
 

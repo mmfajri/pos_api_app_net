@@ -12,7 +12,7 @@ public class UnitService
 {
 	private readonly IUnitRepository _unitRepository;
 
-	public UnitService(UnitRepository unitRepository)
+	public UnitService(IUnitRepository unitRepository)
 	{
 		_unitRepository = unitRepository;
 	}
