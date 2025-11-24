@@ -3,6 +3,8 @@ using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.DTOs.UnitDTO;
 using pos_api_app.Repository.Entities;
 using pos_api_app.Utilities;
+using pos_api_app.Models;
+using pos_api_app.Models.Entities;
 
 namespace pos_api_app.Services;
 
@@ -35,7 +37,37 @@ public class UnitService
 			response.Data = dataDto;
 			return response;
 		}
-		catch (Exception ex)
+		catch
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
+	}
+
+	public async Task<ResponseDTO<UnitDTO>> GetUnitByName(NewUnitDTO req)
+	{
+		var response = new ResponseDTO<UnitDTO>();
+		var dataDT0 = new UnitDTO();
+
+		try
+		{
+			var data = await _unitRepository.GetByName(req.Name);
+			if (data is null)
+			{
+				data = (Unit)req;
+				data.CreatedTime = DateTime.Now;
+				data.IsDeleted = false;
+
+				var newData = await _unitRepository.Create(data);
+				if (newData is not null) dataDT0 = newData;
+			}
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = dataDT0;
+			return response;
+		}
+		catch
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
 			response.Message = StaticValue.ResponseMessage.ErrorSystem;

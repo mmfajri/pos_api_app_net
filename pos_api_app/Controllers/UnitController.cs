@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using pos_api_app.DTOs.AuthDTO;
 using pos_api_app.Services;
+using pos_api_app.DTOs.UnitDTO;
 
 namespace pos_api_app.Controllers;
 
@@ -21,6 +22,17 @@ public class UnitController : ControllerBase
 	public async Task<IActionResult> GetAllUnit()
 	{
 		var response = await _unitService.GetAllUnit();
+
+		if (response.StatusCode != StatusCodes.Status200OK)
+			return BadRequest(response);
+
+		return Ok(response);
+	}
+
+	[HttpPost("GetUnit")]
+	public async Task<IActionResult> GetUnit(NewUnitDTO req)
+	{
+		var response = await _unitService.GetUnitByName(req);
 
 		if (response.StatusCode != StatusCodes.Status200OK)
 			return BadRequest(response);
