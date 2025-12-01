@@ -56,11 +56,16 @@ public class UnitService
 			if (data is null)
 			{
 				data = (Unit)req;
+				data.Name = data.Name.ToLower();
 				data.CreatedTime = DateTime.Now;
 				data.IsDeleted = false;
 
 				var newData = await _unitRepository.Create(data);
 				if (newData is not null) dataDT0 = newData;
+			}
+			else
+			{
+				dataDT0 = data;
 			}
 			response.StatusCode = StatusCodes.Status200OK;
 			response.Message = StaticValue.ResponseMessage.Success;

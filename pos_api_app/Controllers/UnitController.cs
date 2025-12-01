@@ -29,8 +29,8 @@ public class UnitController : ControllerBase
 		return Ok(response);
 	}
 
-	[HttpPost("GetUnit")]
-	public async Task<IActionResult> GetUnit(NewUnitDTO req)
+	[HttpPost("GetUnitByName")]
+	public async Task<IActionResult> GetUnitByName(NewUnitDTO req)
 	{
 		var response = await _unitService.GetUnitByName(req);
 

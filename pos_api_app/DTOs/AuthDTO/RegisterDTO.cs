@@ -13,7 +13,7 @@ public class RegisterDTO
 	{
 		return new Account
 		{
-			UserName = registerDTO.Username ?? null,
+			UserName = registerDTO.Username ?? string.Empty,
 			Password = Hashing.HashPassword(registerDTO.Password ?? string.Empty),
 			Email = registerDTO.Email ?? null
 		};

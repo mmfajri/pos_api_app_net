@@ -7,7 +7,8 @@ public class ProductDTO
 	public int Id { get; set; }
 	public string BarcodeId { get; set; } = string.Empty;
 	public string Title { get; set; } = string.Empty;
-	public int? Amount { get; set; }
+	public string QuantityType { get; set; } = string.Empty;
+	public int? Amount { get; set; } = 0;
 
 
 	public static explicit operator ProductDTO(Product product)
