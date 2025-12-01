@@ -48,24 +48,45 @@ public class ProductService
 
 	}
 
-	public async Task<ProductDTO?> Get(int id)
+	public async Task<ResponseDTO<int?>> DeleteDataProductPrice(int id)
 	{
-		var product = await _productRepository.GetById(id);
-		if (product == null) return null;
+		var response = new ResponseDTO<int?>();
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			try
+			{
+				var getPrice = await _priceRepository.GetById(id);
+				if (getPrice is null)
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
+				getPrice.IsDeleted = true;
+				var isSucced = await _priceRepository.Update(getPrice);
+				if (!isSucced)
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
 
-		var dto = (ProductDTO)product;
-		return dto;
-	}
+				await transactions.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				return response;
 
-	public async Task<int> Delete(int id)
-	{
-		var getEntity = await _productRepository.GetById(id);
-		if (getEntity == null) return -1;
-
-		var delete = await _productRepository.Delete(getEntity);
-		if (!delete) return 0;
-
-		return 1;
+			}
+			catch (Exception ex)
+			{
+				await transactions.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem + ex.Message + ex.InnerException;
+				return response;
+			}
+		}
 	}
 
 	public async Task<int> Edit(ProductDTO product)
@@ -103,7 +124,7 @@ public class ProductService
 			return response;
 		}
 		// Add at the beginning of the method
-		if (string.IsNullOrWhiteSpace(req.BarcodeID) || string.IsNullOrWhiteSpace(req.Unit))
+		if (string.IsNullOrWhiteSpace(req.BarcodeID) || string.IsNullOrWhiteSpace(req.QuantityType))
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
 			response.Message = "BarcodeID and Unit are required";
@@ -116,7 +137,7 @@ public class ProductService
 			{
 				var price = (Price)req;
 				//UNIT PROCESS
-				var unitData = await _unitRepository.GetByName(req.Unit);
+				var unitData = await _unitRepository.GetByName(req.QuantityType);
 				if (unitData is null)
 				{
 					var unit = (Unit)req;
@@ -125,7 +146,6 @@ public class ProductService
 					unitData = await _unitRepository.Create(unit);
 					if (unitData is null)
 					{
-
 						response.StatusCode = StatusCodes.Status400BadRequest;
 						response.Message = StaticValue.ResponseMessage.ErrorSystem;
 						return response;

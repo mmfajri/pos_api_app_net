@@ -6,7 +6,7 @@ public class NewProductDTO
 {
 	public string BarcodeID { get; set; } = string.Empty;
 	public string Title { get; set; } = string.Empty;
-	public string Unit { get; set; } = string.Empty;
+	public string QuantityType { get; set; } = string.Empty;
 	public decimal Amount { get; set; } = 0m;
 
 	public static explicit operator Product(NewProductDTO product)
@@ -22,7 +22,7 @@ public class NewProductDTO
 	{
 		return new Unit
 		{
-			Name = productDTO.Unit
+			Name = productDTO.QuantityType
 		};
 	}
 	public static explicit operator Price(NewProductDTO productDTO)

@@ -46,26 +46,6 @@ public class ProductController : ControllerBase
 		}
 	}
 
-	[HttpGet("{id}/")]
-	public async Task<IActionResult> Get(int id)
-	{
-		var product = await _productService.Get(id);
-		if (product == null) return NotFound(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data not found"
-		});
-
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Data found",
-			Data = product
-		});
-	}
-
 	[HttpPost("Create")]
 	public async Task<IActionResult> Create(NewProductDTO productDTO)
 	{
@@ -127,29 +107,25 @@ public class ProductController : ControllerBase
 	[HttpDelete("Delete")]
 	public async Task<IActionResult> Delete(int id)
 	{
-		var delete = await _productService.Delete(id);
-		switch (delete)
+		var response = await _productService.DeleteDataProductPrice(id);
+		switch (response.StatusCode)
 		{
-			case -1:
-				return BadRequest(new ResponseHandler<ProductDTO>
+			case StatusCodes.Status400BadRequest:
 				{
-					Code = StatusCodes.Status400BadRequest,
-					Status = HttpStatusCode.BadRequest.ToString(),
-					Message = "Bad Connections, Data Failed to Delete"
-				});
-			case 0:
-				return NotFound(new ResponseHandler<ProductDTO>
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
 				{
-					Code = StatusCodes.Status404NotFound,
-					Status = HttpStatusCode.NotFound.ToString(),
-					Message = "Data that want to delete is not found"
-				});
+					return Unauthorized(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			default:
+				{
+					return Ok(response);
+				}
 		}
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Successfully deleted the data",
-		});
 	}
 }
