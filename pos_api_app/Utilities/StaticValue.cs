@@ -9,4 +9,9 @@ public class StaticValue
 		public readonly static string InvalidCredentialUser = "Invalid Credential System";
 		public readonly static string DataNotFound = "Data Not Found";
 	}
+
+	public static class TableColumnName
+	{
+		public readonly static string CreatedTime = "created_time";
+	}
 }

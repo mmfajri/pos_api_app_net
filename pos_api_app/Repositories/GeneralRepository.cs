@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using pos_api_app.Contracts.Repositories;
 using pos_api_app.Data;
+using pos_api_app.Models;
+using pos_api_app.Utilities;
 
 namespace pos_api_app.Repository;
 
 public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
-    where TEntity : class
+    where TEntity : BaseEntity
 {
 	protected readonly PosDbContext _posDbContext;
 
@@ -16,7 +18,7 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 
 	public async Task<IEnumerable<TEntity>> GetAll()
 	{
-		return await _posDbContext.Set<TEntity>().ToListAsync();
+		return await _posDbContext.Set<TEntity>().OrderByDescending(e => e.CreatedTime).ToListAsync();
 	}
 
 	public async Task<TEntity?> GetById(int id)

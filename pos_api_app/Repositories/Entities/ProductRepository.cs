@@ -34,11 +34,11 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		var connection = _posDbContext.Database.GetDbConnection();
 
 		var parameters = new DynamicParameters();
-		var query = @"SELECT product.barcode_id BarcodeId, product.title Title, unit.Name QuantityType, price.amount Amount 
+		var query = @"SELECT price.id id, product.barcode_id BarcodeId, product.title Title, unit.Name QuantityType, price.amount Amount 
                   FROM tb_tr_price price
                   JOIN tb_m_product product on price.product_id = product.id
                   JOIN tb_m_unit unit on price.unit_id = unit.id 
-                  WHERE (product.is_deleted is null OR product.is_deleted  = false)";
+                  WHERE (product.is_deleted is null OR product.is_deleted  = false) and (price.is_deleted is null OR price.is_deleted = false)";
 
 		if (!string.IsNullOrEmpty(barcodeId))
 		{
@@ -46,7 +46,7 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 			parameters.Add("barcodeId", barcodeId);
 		}
 
-		query += "\n ORDER BY product.barcode_id, price.amount DESC";
+		query += "\n ORDER BY price.created_time DESC, product.barcode_id DESC, price.amount DESC";
 
 		await connection.OpenAsync();
 		var result = await connection.QueryAsync<ProductDTO>(query, parameters);

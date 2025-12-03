@@ -10,7 +10,6 @@ public class UnitRepository : GeneralRepository<Unit>, IUnitRepository
 	public UnitRepository(PosDbContext posDbContext) : base(posDbContext)
 	{
 	}
-
 	public async Task<Unit?> GetByName(string name)
 	{
 		return await _posDbContext.Set<Unit>().FirstOrDefaultAsync(unit => unit.Name.ToLower() == name.ToLower());

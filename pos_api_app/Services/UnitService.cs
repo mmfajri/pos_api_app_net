@@ -37,8 +37,9 @@ public class UnitService
 			response.Data = dataDto;
 			return response;
 		}
-		catch
+		catch (Exception ex)
 		{
+			Console.WriteLine(ex);
 			response.StatusCode = StatusCodes.Status400BadRequest;
 			response.Message = StaticValue.ResponseMessage.ErrorSystem;
 			return response;
