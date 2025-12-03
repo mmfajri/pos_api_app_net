@@ -8,25 +8,30 @@ public class ProductDTO
 	public string BarcodeId { get; set; } = string.Empty;
 	public string Title { get; set; } = string.Empty;
 	public string QuantityType { get; set; } = string.Empty;
-	public int? Amount { get; set; } = 0;
+	public decimal Amount { get; set; } = 0;
 
 
-	public static explicit operator ProductDTO(Product product)
+	public static explicit operator Price(ProductDTO productDTO)
 	{
-		return new ProductDTO
+		return new Price
 		{
-			Id = product.Id,
-			BarcodeId = product.BarcodeID,
-			Title = product.Title,
+			Id = productDTO.Id,
+			Amount = productDTO.Amount
 		};
 	}
-
 	public static explicit operator Product(ProductDTO productDTO)
 	{
 		return new Product
 		{
 			BarcodeID = productDTO.BarcodeId,
 			Title = productDTO.Title,
+		};
+	}
+	public static explicit operator Unit(ProductDTO productDTO)
+	{
+		return new Unit
+		{
+			Name = productDTO.QuantityType
 		};
 	}
 }

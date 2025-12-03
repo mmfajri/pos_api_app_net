@@ -70,37 +70,25 @@ public class ProductController : ControllerBase
 	[HttpPut("Update")]
 	public async Task<IActionResult> Update(ProductDTO productDTO)
 	{
-		var isUpdated = await _productService.Edit(productDTO);
-		switch (isUpdated)
+		var response = await _productService.Edit(productDTO);
+		switch (response.StatusCode)
 		{
-			case 0:
-				return BadRequest(new ResponseHandler<ProductDTO>
+			case StatusCodes.Status400BadRequest:
 				{
-					Code = StatusCodes.Status400BadRequest,
-					Status = HttpStatusCode.BadRequest.ToString(),
-					Message = "Bad Connections, Data Failed to Update"
-				});
-			case -1:
-				return NotFound(new ResponseHandler<ProductDTO>
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
 				{
-					Code = StatusCodes.Status404NotFound,
-					Status = HttpStatusCode.NotFound.ToString(),
-					Message = "Data that want to update is not found"
-				});
-			case 1:
-				return Ok(new ResponseHandler<ProductDTO>
+					return Unauthorized(response);
+				}
+			case StatusCodes.Status404NotFound:
 				{
-					Code = StatusCodes.Status200OK,
-					Status = HttpStatusCode.OK.ToString(),
-					Message = "Successfully Updated",
-				});
+					return NotFound(response);
+				}
 			default:
-				return StatusCode(StatusCodes.Status500InternalServerError, new ResponseHandler<ProductDTO>
 				{
-					Code = StatusCodes.Status500InternalServerError,
-					Status = HttpStatusCode.InternalServerError.ToString(),
-					Message = "Internal Server Error"
-				});
+					return Ok(response);
+				}
 		}
 	}
 

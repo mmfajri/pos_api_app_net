@@ -89,26 +89,76 @@ public class ProductService
 		}
 	}
 
-	public async Task<int> Edit(ProductDTO product)
+	public async Task<ResponseDTO<bool>> Edit(ProductDTO req)
 	{
-		using (var transaction = _posDbContext.Database.BeginTransaction())
+		var response = new ResponseDTO<bool>();
+		using (var transaction = await _posDbContext.Database.BeginTransactionAsync())
 		{
 			try
 			{
-				var IsExits = await _productRepository.IsExits(product.Id);
-				if (!IsExits) return -1;
+				// Get Product Id
+				var productData = await _productRepository.GetByBarcode(req.BarcodeId);
+				if (productData is null)
+				{
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					response.Data = false;
+					return response;
+				}
+				productData.Title = req.Title;
+				productData.BarcodeID = req.BarcodeId;
+				productData.UpdatedTime = DateTime.UtcNow;
+				var isUpdated = await _productRepository.Update(productData);
+				if (!isUpdated)
+				{
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					response.Data = isUpdated;
+					return response;
+				}
 
-				var edit = await _productRepository.Update((Product)product);
-				if (!edit) return 0;
-
-				transaction.Commit();
-				return 1;
-
+				// Get Unit Id
+				var unitData = await _unitRepository.GetByName(req.QuantityType);
+				if (unitData is null)
+				{
+					var unit = (Unit)req;
+					unit.CreatedTime = DateTime.UtcNow;
+					unit.IsDeleted = false;
+					unitData = await _unitRepository.Create(unit);
+					if (unitData is null)
+					{
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
+				}
+				// Update Price 
+				var priceData = await _priceRepository.GetById(req.Id);
+				if (priceData is null)
+				{
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
+				priceData.UnitId = unitData.Id;
+				priceData.ProductId = priceData.Id;
+				priceData.UpdatedTime = DateTime.UtcNow;
+				priceData.Amount = req.Amount;
+				var edit = await _priceRepository.Update(priceData);
+				if (!edit)
+				{
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					return response;
+				}
+				await transaction.CommitAsync();
+				return response;
 			}
 			catch
 			{
-				transaction.Rollback();
-				return 0;
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
 			}
 		}
 	}
@@ -127,7 +177,7 @@ public class ProductService
 		if (string.IsNullOrWhiteSpace(req.BarcodeID) || string.IsNullOrWhiteSpace(req.QuantityType))
 		{
 			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = "BarcodeID and Unit are required";
+			response.Message = "BarcodeID and/or Unit are required";
 			return response;
 		}
 
@@ -177,6 +227,8 @@ public class ProductService
 					price.ProductId = productData.Id;
 				}
 				//PRICE PROCESS
+				price.CreatedTime = DateTime.UtcNow;
+				price.IsDeleted = false;
 				var priceData = await _priceRepository.Create(price);
 				if (priceData is null)
 				{
