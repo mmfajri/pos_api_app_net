@@ -5,19 +5,22 @@ using pos_api_app.Repository.Entities;
 using pos_api_app.Utilities;
 using pos_api_app.Models;
 using pos_api_app.Models.Entities;
+using pos_api_app.Data;
 
 namespace pos_api_app.Services;
 
 public class UnitService
 {
 	private readonly IUnitRepository _unitRepository;
+	private readonly PosDbContext _posDbContext;
 
-	public UnitService(IUnitRepository unitRepository)
+	public UnitService(IUnitRepository unitRepository, PosDbContext posDbContext)
 	{
 		_unitRepository = unitRepository;
+		_posDbContext = posDbContext;
 	}
 
-	public async Task<ResponseDTO<List<UnitDTO>>> GetAllUnit()
+	public async Task<ResponseDTO<List<UnitDTO>>> GetAllUnitDropdown()
 	{
 		var response = new ResponseDTO<List<UnitDTO>>();
 		var dataDto = new List<UnitDTO>();
@@ -46,38 +49,48 @@ public class UnitService
 		}
 	}
 
-	public async Task<ResponseDTO<UnitDTO>> GetUnitByName(NewUnitDTO req)
+	public async Task<ResponseDTO<UnitDTO>> GetUnitByNameDropdown(string req)
 	{
 		var response = new ResponseDTO<UnitDTO>();
 		var dataDT0 = new UnitDTO();
-
-		try
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
 		{
-			var data = await _unitRepository.GetByName(req.Name);
-			if (data is null)
+			try
 			{
-				data = (Unit)req;
-				data.Name = data.Name.ToLower();
-				data.CreatedTime = DateTime.Now;
-				data.IsDeleted = false;
+				if (req != null)
+				{
+					var data = await _unitRepository.GetByName(req);
+					if (data is null)
+					{
+						data = new Unit
+						{
+							Name = req.ToLower(),
+							CreatedTime = DateTime.UtcNow,
+							IsDeleted = false,
+						};
 
-				var newData = await _unitRepository.Create(data);
-				if (newData is not null) dataDT0 = newData;
+						var newData = await _unitRepository.Create(data);
+						if (newData is not null) dataDT0 = newData;
+					}
+					else
+					{
+						dataDT0 = data;
+					}
+				}
+				await transactions.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				response.Data = dataDT0;
+				return response;
 			}
-			else
+			catch
 			{
-				dataDT0 = data;
+				await transactions.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
 			}
-			response.StatusCode = StatusCodes.Status200OK;
-			response.Message = StaticValue.ResponseMessage.Success;
-			response.Data = dataDT0;
-			return response;
-		}
-		catch
-		{
-			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = StaticValue.ResponseMessage.ErrorSystem;
-			return response;
+
 		}
 	}
 }

@@ -18,10 +18,10 @@ public class UnitController : ControllerBase
 		_unitService = unitService;
 	}
 
-	[HttpPost("GetAllUnit")]
+	[HttpGet("GetAllUnitDropdown")]
 	public async Task<IActionResult> GetAllUnit()
 	{
-		var response = await _unitService.GetAllUnit();
+		var response = await _unitService.GetAllUnitDropdown();
 
 		if (response.StatusCode != StatusCodes.Status200OK)
 			return BadRequest(response);
@@ -29,10 +29,10 @@ public class UnitController : ControllerBase
 		return Ok(response);
 	}
 
-	[HttpPost("GetUnitByName")]
-	public async Task<IActionResult> GetUnitByName(NewUnitDTO req)
+	[HttpGet("GetUnitByNameDropdown")]
+	public async Task<IActionResult> GetUnitByName([FromQuery] string name)
 	{
-		var response = await _unitService.GetUnitByName(req);
+		var response = await _unitService.GetUnitByNameDropdown(name);
 
 		if (response.StatusCode != StatusCodes.Status200OK)
 			return BadRequest(response);

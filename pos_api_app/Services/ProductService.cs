@@ -45,7 +45,56 @@ public class ProductService
 			response.Message = StaticValue.ResponseMessage.ErrorSystem;
 			return response;
 		}
+	}
 
+	public async Task<ResponseDTO<List<ProductDTODropdown>?>> GetAllProductPriceDropdown()
+	{
+		var response = new ResponseDTO<List<ProductDTODropdown>?>();
+		var dataDropdown = new List<ProductDTODropdown>();
+
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			var dataProduct = await _productRepository.GetAll();
+			if (dataProduct is null)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				response.Data = null;
+				return response;
+			}
+			foreach (var item in dataProduct)
+			{
+				var data = (ProductDTODropdown)item;
+				dataDropdown.Add(data);
+			}
+		}
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		response.Data = dataDropdown;
+		return response;
+	}
+
+	public async Task<ResponseDTO<ProductDTODropdown?>> GetProductByBarcodeDropdown(string BarcodeId)
+	{
+		var response = new ResponseDTO<ProductDTODropdown?>();
+		var dataDropdown = new ProductDTODropdown();
+
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			var dataProduct = await _productRepository.GetByBarcode(BarcodeId);
+			if (dataProduct is null)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				response.Data = null;
+				return response;
+			}
+			dataDropdown = (ProductDTODropdown)dataProduct;
+		}
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		response.Data = dataDropdown;
+		return response;
 	}
 
 	public async Task<ResponseDTO<int?>> DeleteDataProductPrice(int id)

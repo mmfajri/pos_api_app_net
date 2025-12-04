@@ -46,6 +46,56 @@ public class ProductController : ControllerBase
 		}
 	}
 
+	[HttpGet("GetAllProductDropdown")]
+	public async Task<IActionResult> GetAllProductDropdown()
+	{
+		var response = await _productService.GetAllProductPriceDropdown();
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, response);
+				}
+		}
+	}
+
+	[HttpGet("GetProductByBarcodeIdDropdown")]
+	public async Task<IActionResult> GetProductByBarcodeIdDropdown([FromQuery] string barcodeId)
+	{
+		var response = await _productService.GetProductByBarcodeDropdown(barcodeId);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, response);
+				}
+		}
+	}
+
 	[HttpPost("Create")]
 	public async Task<IActionResult> Create(NewProductDTO productDTO)
 	{
