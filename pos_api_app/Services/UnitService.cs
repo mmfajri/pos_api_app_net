@@ -62,15 +62,9 @@ public class UnitService
 					var data = await _unitRepository.GetByName(req);
 					if (data is null)
 					{
-						data = new Unit
-						{
-							Name = req.ToLower(),
-							CreatedTime = DateTime.UtcNow,
-							IsDeleted = false,
-						};
-
-						var newData = await _unitRepository.Create(data);
-						if (newData is not null) dataDT0 = newData;
+						response.StatusCode = StatusCodes.Status404NotFound;
+						response.Message = StaticValue.ResponseMessage.DataNotFound;
+						return response;
 					}
 					else
 					{

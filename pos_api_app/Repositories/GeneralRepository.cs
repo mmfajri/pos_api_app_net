@@ -18,12 +18,12 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 
 	public async Task<IEnumerable<TEntity>> GetAll()
 	{
-		return await _posDbContext.Set<TEntity>().OrderByDescending(e => e.CreatedTime).ToListAsync();
+		return await _posDbContext.Set<TEntity>().Where(e => e.IsDeleted != true).OrderByDescending(e => e.CreatedTime).ToListAsync();
 	}
 
 	public async Task<TEntity?> GetById(int id)
 	{
-		var entity = await _posDbContext.Set<TEntity>().FindAsync(id);
+		var entity = await _posDbContext.Set<TEntity>().Where(e => e.IsDeleted != true && e.Id == id).FirstOrDefaultAsync();
 		_posDbContext.ChangeTracker.Clear();
 		return entity;
 	}
