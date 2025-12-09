@@ -22,9 +22,9 @@ public class ProductController : ControllerBase
 
 
 	[HttpGet]
-	public async Task<IActionResult> Get([FromQuery] string? barcodeID = "")
+	public async Task<IActionResult> Get([FromQuery] ProductTableDTO req)
 	{
-		var response = await _productService.Get(barcodeID);
+		var response = await _productService.Get(req);
 		switch (response.StatusCode)
 		{
 			case StatusCodes.Status400BadRequest:

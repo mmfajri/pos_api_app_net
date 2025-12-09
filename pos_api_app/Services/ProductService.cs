@@ -22,12 +22,12 @@ public class ProductService
 		_posDbContext = posDbContext;
 	}
 
-	public async Task<ResponseDTO<List<ProductDTO>?>> Get(string? barcodeID = "")
+	public async Task<ResponseDTO<List<ProductDTO>?>> Get(ProductTableDTO req)
 	{
 		var response = new ResponseDTO<List<ProductDTO>?>();
 		try
 		{
-			var data = await _productRepository.GetProduct(barcodeID);
+			var data = await _productRepository.GetProduct(req.BarcodeId);
 			if (data is null || data.Count == 0)
 			{
 				response.StatusCode = StatusCodes.Status404NotFound;
