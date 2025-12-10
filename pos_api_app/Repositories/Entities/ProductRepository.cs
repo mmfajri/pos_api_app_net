@@ -5,6 +5,7 @@ using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
 using pos_api_app.DTOs.ProductDTO;
 using pos_api_app.Models.Entities;
+using pos_api_app.Utilities.Handlers;
 
 namespace pos_api_app.Repository.Entities;
 
@@ -29,7 +30,7 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		return await _posDbContext.Set<Product>().AnyAsync(product => product.Id == id);
 	}
 
-	public async Task<List<ProductDTO>> GetProduct(string? barcodeId = "")
+	public async Task<List<ProductDTO>> GetProduct(ProductTableDTO product)
 	{
 		var connection = _posDbContext.Database.GetDbConnection();
 
@@ -40,13 +41,13 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
                   JOIN tb_m_unit unit on price.unit_id = unit.id 
                   WHERE (product.is_deleted is null OR product.is_deleted  = false) and (price.is_deleted is null OR price.is_deleted = false)";
 
-		if (!string.IsNullOrEmpty(barcodeId))
+		if (!string.IsNullOrEmpty(product.BarcodeId))
 		{
 			query += "\n AND product.barcode_id = @barcodeId";
-			parameters.Add("barcodeId", barcodeId);
+			parameters.Add("barcodeId", product.BarcodeId);
 		}
+		query = SQLGeneralHandler.PaginationHandler(query, product.SortColumn, product.SortColumnDir, product.PageNumber, product.RowsPerPage);
 
-		query += "\n ORDER BY price.created_time DESC, product.barcode_id DESC, price.amount DESC";
 
 		await connection.OpenAsync();
 		var result = await connection.QueryAsync<ProductDTO>(query, parameters);
