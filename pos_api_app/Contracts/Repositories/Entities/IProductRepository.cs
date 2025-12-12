@@ -9,5 +9,5 @@ public interface IProductRepository : IGeneralRepository<Product>
 	Task<Product?> GetByBarcode(string barcode);
 	Task<bool> UniqueBarcode(string barcode);
 	Task<bool> IsProductExist(int id);
-	Task<List<ProductDTO>> GetProduct(ProductTableDTO product);
+	Task<(List<ProductDTO>?, int)> GetProduct(ProductTableDTO product);
 }
