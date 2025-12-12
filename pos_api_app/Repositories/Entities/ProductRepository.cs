@@ -30,7 +30,7 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		return await _posDbContext.Set<Product>().AnyAsync(product => product.Id == id);
 	}
 
-	public async Task<List<ProductDTO>> GetProduct(ProductTableDTO product)
+	public async Task<(List<ProductDTO>?, int)> GetProduct(ProductTableDTO product)
 	{
 		var connection = _posDbContext.Database.GetDbConnection();
 
@@ -46,12 +46,12 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 			query += "\n AND product.barcode_id = @barcodeId";
 			parameters.Add("barcodeId", product.BarcodeId);
 		}
+		string queryCount = SQLGeneralHandler.CountData(query);
 		query = SQLGeneralHandler.PaginationHandler(query, product.SortColumn, product.SortColumnDir, product.PageNumber, product.RowsPerPage);
 
-
 		await connection.OpenAsync();
+		var count = await connection.QueryAsync<int>(queryCount, parameters);
 		var result = await connection.QueryAsync<ProductDTO>(query, parameters);
-		return result.ToList();
-
+		return (result.ToList(), count.FirstOrDefault());
 	}
 }

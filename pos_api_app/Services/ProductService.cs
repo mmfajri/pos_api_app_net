@@ -1,5 +1,6 @@
 ﻿using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
+using pos_api_app.DTOs.GeneralDTO;
 using pos_api_app.DTOs.ProductDTO;
 using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.Models.Entities;
@@ -22,12 +23,12 @@ public class ProductService
 		_posDbContext = posDbContext;
 	}
 
-	public async Task<ResponseDTO<List<ProductDTO>?>> Get(ProductTableDTO req)
+	public async Task<ResponseDTO<ResponseTableDTO<ProductDTO>?>> Get(ProductTableDTO req)
 	{
-		var response = new ResponseDTO<List<ProductDTO>?>();
+		var response = new ResponseDTO<ResponseTableDTO<ProductDTO>?>();
 		try
 		{
-			var data = await _productRepository.GetProduct(req);
+			var (data, count) = await _productRepository.GetProduct(req);
 			if (data is null || data.Count == 0)
 			{
 				response.StatusCode = StatusCodes.Status404NotFound;
@@ -36,7 +37,13 @@ public class ProductService
 			}
 			response.StatusCode = StatusCodes.Status200OK;
 			response.Message = StaticValue.ResponseMessage.Success;
-			response.Data = data;
+			response.Data = new ResponseTableDTO<ProductDTO> // Initialize Data first
+			{
+				DataTable = data,
+				TotalRecord = count,
+				CurrentPage = req.PageNumber,
+				TotalPage = (int)Math.Ceiling(count / (double)req.RowsPerPage)
+			};
 			return response;
 		}
 		catch

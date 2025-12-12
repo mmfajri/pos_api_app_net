@@ -10,4 +10,11 @@ public class SQLGeneralHandler
 		return query;
 	}
 
+	public static string CountData(string query)
+	{
+		query = $@"SELECT COUNT(1) FROM ({query})";
+		return query;
+	}
+
+
 }
