@@ -39,7 +39,7 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
                   FROM tb_tr_price price
                   JOIN tb_m_product product on price.product_id = product.id
                   JOIN tb_m_unit unit on price.unit_id = unit.id 
-                  WHERE (product.is_deleted is null OR product.is_deleted  = false) and (price.is_deleted is null OR price.is_deleted = false)";
+                  WHERE ((product.is_deleted is null OR product.is_deleted  = false) and (price.is_deleted is null OR price.is_deleted = false)) ";
 
 		if (!string.IsNullOrEmpty(product.BarcodeId))
 		{

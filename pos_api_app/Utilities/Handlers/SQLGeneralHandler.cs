@@ -4,8 +4,10 @@ public class SQLGeneralHandler
 {
 	public static string PaginationHandler(string query, string sortColumn, string sortColumnDir, int rowPage, int pagePerRow)
 	{
-		int totalPagePerRows = rowPage * pagePerRow;
-		query = $@"SELECT * FROM ({query}) TBL ORDER BY TBL.{sortColumn} {sortColumnDir} LIMIT {totalPagePerRows} OFFSET {rowPage}";
+		// rowPage should be 1-based (page 1, page 2, etc.)
+		int offset = (rowPage - 1) * pagePerRow;
+
+		query = $@"SELECT * FROM ({query}) TBL ORDER BY TBL.{sortColumn} {sortColumnDir} LIMIT {pagePerRow} OFFSET {offset}";
 
 		return query;
 	}
@@ -15,6 +17,4 @@ public class SQLGeneralHandler
 		query = $@"SELECT COUNT(1) FROM ({query})";
 		return query;
 	}
-
-
 }
