@@ -27,7 +27,7 @@ public class ProductService
 		var response = new ResponseDTO<List<ProductDTO>?>();
 		try
 		{
-			var data = await _productRepository.GetProduct(req.BarcodeId);
+			var data = await _productRepository.GetProduct(req);
 			if (data is null || data.Count == 0)
 			{
 				response.StatusCode = StatusCodes.Status404NotFound;
