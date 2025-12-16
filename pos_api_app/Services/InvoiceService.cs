@@ -40,18 +40,18 @@ public class InvoiceService
 					if (unitList is not null)
 					{
 						invoiceData.UnitList = unitList;
-
 					}
 				}
 				else
 				{
-					invoiceData = null;
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
 				}
 
 				response.StatusCode = StatusCodes.Status200OK;
 				response.Message = StaticValue.ResponseMessage.Success;
 				response.Data = invoiceData;
-
 				return response;
 			}
 			catch (Exception ex)
