@@ -10,10 +10,12 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
     where TEntity : BaseEntity
 {
 	protected readonly PosDbContext _posDbContext;
+	protected readonly ILogger<TEntity>? _logger;
 
-	public GeneralRepository(PosDbContext posDbContext)
+	public GeneralRepository(PosDbContext posDbContext, ILogger<TEntity>? logger = null)
 	{
 		_posDbContext = posDbContext;
+		_logger = logger is not null ? logger : null;
 	}
 
 	public async Task<IEnumerable<TEntity>> GetAll()

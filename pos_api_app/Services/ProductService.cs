@@ -290,7 +290,7 @@ public class ProductService
 				}
 				else
 				{
-					if (productData.Title.Equals(req.Title, StringComparison.OrdinalIgnoreCase))
+					if (!productData.Title.Equals(req.Title, StringComparison.OrdinalIgnoreCase))
 					{
 						await transactions.RollbackAsync();
 						response.StatusCode = StatusCodes.Status400BadRequest;

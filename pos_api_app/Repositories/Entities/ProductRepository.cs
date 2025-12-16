@@ -12,7 +12,7 @@ namespace pos_api_app.Repository.Entities;
 
 public class ProductRepository : GeneralRepository<Product>, IProductRepository
 {
-	public ProductRepository(PosDbContext posDbContext) : base(posDbContext)
+	public ProductRepository(PosDbContext posDbContext, ILogger<Product> logger) : base(posDbContext, logger)
 	{
 	}
 
@@ -44,11 +44,14 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 
 		if (!string.IsNullOrEmpty(product.BarcodeId))
 		{
-			query += "\n AND product.barcode_id = @barcodeId";
-			parameters.Add("barcodeId", product.BarcodeId);
+			query += "\n AND product.barcode_id LIKE @barcodeId";
+			parameters.Add("barcodeId", $"%{product.BarcodeId}%");
 		}
 		string queryCount = SQLGeneralHandler.CountData(query);
 		query = SQLGeneralHandler.PaginationHandler(query, product.SortColumn, product.SortColumnDir, product.PageNumber, product.RowsPerPage);
+
+		QueryLogHandler.LogInfoQuery<Product>(_logger!, queryCount);
+		QueryLogHandler.LogInfoQuery<Product>(_logger!, query, parameters);
 
 		if (connection.State != ConnectionState.Open) await connection.OpenAsync();
 
