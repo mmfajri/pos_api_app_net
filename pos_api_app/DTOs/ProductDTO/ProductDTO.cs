@@ -4,12 +4,11 @@ namespace pos_api_app.DTOs.ProductDTO;
 
 public class ProductDTO
 {
-	public int Id { get; set; }
+	public int Id { get; set; } //--> Must Later to Rename to PriceId to Avoid Confusion
 	public string BarcodeId { get; set; } = string.Empty;
 	public string Title { get; set; } = string.Empty;
 	public string QuantityType { get; set; } = string.Empty;
 	public decimal Amount { get; set; } = 0;
-
 
 	public static explicit operator Price(ProductDTO productDTO)
 	{

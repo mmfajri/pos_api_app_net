@@ -26,6 +26,7 @@ public class ProductService
 	public async Task<ResponseDTO<ResponseTableDTO<ProductDTO>?>> Get(ProductTableDTO req)
 	{
 		var response = new ResponseDTO<ResponseTableDTO<ProductDTO>?>();
+		using var transaction = await _posDbContext.Database.BeginTransactionAsync();
 		try
 		{
 			var (data, count) = await _productRepository.GetProduct(req);

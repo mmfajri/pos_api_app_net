@@ -37,6 +37,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<TransactionService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UnitService>();
+builder.Services.AddScoped<InvoiceService>();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -44,7 +45,7 @@ builder.Services.AddControllers();
 //Add Fluent Validation Setting
 
 //Add Service for Token
-builder.Services.AddScoped<ITokenHandler, TokenHandler>();
+builder.Services.AddTransient<ITokenHandler, TokenHandler>();
 
 //Build Cors Service
 builder.Services.AddCors(options =>
@@ -95,8 +96,8 @@ builder.Services.AddSwaggerGen(x =>
 		Description = "JWT Authorization header using the Bearer scheme."
 	});
 	x.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-    {
+			{
+			{
     new OpenApiSecurityScheme
     {
     Reference = new OpenApiReference

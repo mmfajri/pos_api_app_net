@@ -54,4 +54,25 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		var result = await connection.QueryAsync<ProductDTO>(query, parameters);
 		return (result.ToList(), count.FirstOrDefault());
 	}
+
+	public async Task<ProductDTO?> GetSingleProductPriceByBarcodeId(string BarcodeId, string? unitName)
+	{
+		var query = await (from price in _posDbContext.Prices
+				   join product in _posDbContext.Products on price.ProductId equals product.Id into product_g
+				   from product in product_g.DefaultIfEmpty()
+				   join unit in _posDbContext.Units on price.UnitId equals unit.Id into unit_g
+				   from unit in unit_g.DefaultIfEmpty()
+				   where product.BarcodeID == BarcodeId &&
+				   (string.IsNullOrEmpty(unitName) || unit.Name.ToLower() == unitName)
+				   orderby unit.Id descending
+				   select new ProductDTO
+				   {
+					   Id = price.Id,
+					   BarcodeId = product.BarcodeID,
+					   Title = product.Title,
+					   QuantityType = unit.Name,
+					   Amount = price.Amount
+				   }).FirstOrDefaultAsync();
+		return query;
+	}
 }
