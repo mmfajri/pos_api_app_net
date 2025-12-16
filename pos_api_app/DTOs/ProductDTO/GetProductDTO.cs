@@ -2,23 +2,23 @@
 
 namespace pos_api_app.DTOs.ProductDTO;
 
-public class ProductDTO
+public class GetProductDTO
 {
-	public int Id { get; set; } //--> Must Later to Rename to PriceId to Avoid Confusion
+	public int PriceId { get; set; } //--> Must Later to Rename to PriceId to Avoid Confusion
 	public string BarcodeId { get; set; } = string.Empty;
 	public string Title { get; set; } = string.Empty;
 	public string QuantityType { get; set; } = string.Empty;
 	public decimal Amount { get; set; } = 0;
 
-	public static explicit operator Price(ProductDTO productDTO)
+	public static explicit operator Price(GetProductDTO productDTO)
 	{
 		return new Price
 		{
-			Id = productDTO.Id,
+			Id = productDTO.PriceId,
 			Amount = productDTO.Amount
 		};
 	}
-	public static explicit operator Product(ProductDTO productDTO)
+	public static explicit operator Product(GetProductDTO productDTO)
 	{
 		return new Product
 		{
@@ -26,7 +26,7 @@ public class ProductDTO
 			Title = productDTO.Title,
 		};
 	}
-	public static explicit operator Unit(ProductDTO productDTO)
+	public static explicit operator Unit(GetProductDTO productDTO)
 	{
 		return new Unit
 		{

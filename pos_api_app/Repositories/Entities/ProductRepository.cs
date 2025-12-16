@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using pos_api_app.Contracts.Repositories.Entities;
@@ -30,12 +31,12 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		return await _posDbContext.Set<Product>().AnyAsync(product => product.Id == id);
 	}
 
-	public async Task<(List<ProductDTO>?, int)> GetProduct(ProductTableDTO product)
+	public async Task<(List<GetProductDTO>?, int)> GetProduct(ProductTableDTO product)
 	{
 		var connection = _posDbContext.Database.GetDbConnection();
 
 		var parameters = new DynamicParameters();
-		var query = @"SELECT price.id id, product.barcode_id BarcodeId, product.title Title, unit.Name QuantityType, price.amount Amount 
+		var query = @"SELECT price.id PriceId, product.barcode_id BarcodeId, product.title Title, unit.Name QuantityType, price.amount Amount 
                   FROM tb_tr_price price
                   JOIN tb_m_product product on price.product_id = product.id
                   JOIN tb_m_unit unit on price.unit_id = unit.id 
@@ -49,13 +50,14 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		string queryCount = SQLGeneralHandler.CountData(query);
 		query = SQLGeneralHandler.PaginationHandler(query, product.SortColumn, product.SortColumnDir, product.PageNumber, product.RowsPerPage);
 
-		await connection.OpenAsync();
+		if (connection.State != ConnectionState.Open) await connection.OpenAsync();
+
 		var count = await connection.QueryAsync<int>(queryCount, parameters);
-		var result = await connection.QueryAsync<ProductDTO>(query, parameters);
+		var result = await connection.QueryAsync<GetProductDTO>(query, parameters);
 		return (result.ToList(), count.FirstOrDefault());
 	}
 
-	public async Task<ProductDTO?> GetSingleProductPriceByBarcodeId(string BarcodeId, string? unitName)
+	public async Task<GetProductDTO?> GetSingleProductPriceByBarcodeId(string BarcodeId, string? unitName)
 	{
 		var query = await (from price in _posDbContext.Prices
 				   join product in _posDbContext.Products on price.ProductId equals product.Id into product_g
@@ -65,9 +67,9 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 				   where product.BarcodeID == BarcodeId &&
 				   (string.IsNullOrEmpty(unitName) || unit.Name.ToLower() == unitName)
 				   orderby unit.Id descending
-				   select new ProductDTO
+				   select new GetProductDTO
 				   {
-					   Id = price.Id,
+					   PriceId = price.Id,
 					   BarcodeId = product.BarcodeID,
 					   Title = product.Title,
 					   QuantityType = unit.Name,

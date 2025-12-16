@@ -25,8 +25,9 @@ public class InvoiceService
 	public async Task<ResponseDTO<InvoiceProductDTO>> GetProductPriceByBarcodeId(InvoiceGetProductPriceDTO req)
 	{
 		var response = new ResponseDTO<InvoiceProductDTO>();
-		var data = new ProductDTO();
+		var data = new GetProductDTO();
 		var unitList = new List<InvoiceUnitDTO>();
+		var invoiceData = new InvoiceProductDTO();
 		using (var transaction = await _posDbContext.Database.BeginTransactionAsync())
 		{
 			try
@@ -34,10 +35,18 @@ public class InvoiceService
 				data = await _productRepository.GetSingleProductPriceByBarcodeId(req.BarcodeId, req.Unit);
 				if (data is not null)
 				{
+					invoiceData = new InvoiceProductDTO(data!);
 					unitList = await _unitRepository.GetUnitByProductBarcodeId(req.BarcodeId);
+					if (unitList is not null)
+					{
+						invoiceData.UnitList = unitList;
+
+					}
 				}
-				var invoiceData = new InvoiceProductDTO(data!);
-				invoiceData.UnitList = unitList;
+				else
+				{
+					invoiceData = null;
+				}
 
 				response.StatusCode = StatusCodes.Status200OK;
 				response.Message = StaticValue.ResponseMessage.Success;

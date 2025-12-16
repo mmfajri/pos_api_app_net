@@ -24,41 +24,49 @@ public class AuthService
 	{
 		var response = new ResponseDTO<bool>();
 
-		try
+		using (var transaction = await _posDbContext.Database.BeginTransactionAsync())
 		{
-			// Check if the Username Exist in the database
-			var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username ?? string.Empty);
-			if (isUsernameExist)
+			try
 			{
-				response.StatusCode = StatusCodes.Status400BadRequest;
-				response.Message = "Invalid Credential Username";
+				// Check if the Username Exist in the database
+				var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username ?? string.Empty);
+				if (isUsernameExist)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = "Invalid Credential Username";
+					return response;
+				}
+
+				// Save it to the Database
+				var model = (Account)req;
+				model.IsDeleted = false;
+				model.CreatedTime = DateTime.UtcNow;
+				var isSuccess = await _accountRepository.Create(model);
+				if (isSuccess is null)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = "Invalid Credential Username";
+					return response;
+				}
+
+				await transaction.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				response.Data = true;
 				return response;
 			}
-
-			// Save it to the Database
-			var model = (Account)req;
-			model.IsDeleted = false;
-			model.CreatedTime = DateTime.UtcNow;
-			var isSuccess = await _accountRepository.Create(model);
-			if (isSuccess is null)
+			catch
 			{
+				await transaction.RollbackAsync();
 				response.StatusCode = StatusCodes.Status400BadRequest;
-				response.Message = "Invalid Credential Username";
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				response.Data = false;
 				return response;
 			}
+		}
 
-			response.StatusCode = StatusCodes.Status200OK;
-			response.Message = StaticValue.ResponseMessage.Success;
-			response.Data = true;
-			return response;
-		}
-		catch
-		{
-			response.StatusCode = StatusCodes.Status400BadRequest;
-			response.Message = StaticValue.ResponseMessage.ErrorSystem;
-			response.Data = false;
-			return response;
-		}
 	}
 
 	public async Task<ResponseDTO<AuthDTO>> Login(LoginDTO req)
@@ -89,7 +97,7 @@ public class AuthService
 			return response;
 		}
 
-		// Generate Token JWT
+		// Generate Token JWT (Later ON)
 		response.StatusCode = StatusCodes.Status200OK;
 		response.Message = StaticValue.ResponseMessage.Success;
 		return response;

@@ -117,7 +117,7 @@ public class ProductController : ControllerBase
 	}
 
 	[HttpPut("Update")]
-	public async Task<IActionResult> Update(ProductDTO productDTO)
+	public async Task<IActionResult> Update(GetProductDTO productDTO)
 	{
 		var response = await _productService.Edit(productDTO);
 		switch (response.StatusCode)

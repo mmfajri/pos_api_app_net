@@ -23,9 +23,9 @@ public class ProductService
 		_posDbContext = posDbContext;
 	}
 
-	public async Task<ResponseDTO<ResponseTableDTO<ProductDTO>?>> Get(ProductTableDTO req)
+	public async Task<ResponseDTO<ResponseTableDTO<GetProductDTO>?>> Get(ProductTableDTO req)
 	{
-		var response = new ResponseDTO<ResponseTableDTO<ProductDTO>?>();
+		var response = new ResponseDTO<ResponseTableDTO<GetProductDTO>?>();
 		using var transaction = await _posDbContext.Database.BeginTransactionAsync();
 		try
 		{
@@ -38,7 +38,7 @@ public class ProductService
 			}
 			response.StatusCode = StatusCodes.Status200OK;
 			response.Message = StaticValue.ResponseMessage.Success;
-			response.Data = new ResponseTableDTO<ProductDTO> // Initialize Data first
+			response.Data = new ResponseTableDTO<GetProductDTO> // Initialize Data first
 			{
 				DataTable = data,
 				TotalRecord = count,
@@ -98,6 +98,7 @@ public class ProductService
 				return response;
 			}
 			dataDropdown = (ProductDTODropdown)dataProduct;
+			await transactions.CommitAsync();
 		}
 		response.StatusCode = StatusCodes.Status200OK;
 		response.Message = StaticValue.ResponseMessage.Success;
@@ -146,7 +147,7 @@ public class ProductService
 		}
 	}
 
-	public async Task<ResponseDTO<bool>> Edit(ProductDTO req)
+	public async Task<ResponseDTO<bool>> Edit(GetProductDTO req)
 	{
 		var response = new ResponseDTO<bool>();
 		using (var transaction = await _posDbContext.Database.BeginTransactionAsync())
@@ -157,6 +158,7 @@ public class ProductService
 				var productData = await _productRepository.GetByBarcode(req.BarcodeId);
 				if (productData is null)
 				{
+					await transaction.RollbackAsync();
 					response.StatusCode = StatusCodes.Status404NotFound;
 					response.Message = StaticValue.ResponseMessage.DataNotFound;
 					response.Data = false;
@@ -168,6 +170,7 @@ public class ProductService
 				var isUpdated = await _productRepository.Update(productData);
 				if (!isUpdated)
 				{
+					await transaction.RollbackAsync();
 					response.StatusCode = StatusCodes.Status400BadRequest;
 					response.Message = StaticValue.ResponseMessage.ErrorSystem;
 					response.Data = isUpdated;
@@ -184,15 +187,17 @@ public class ProductService
 					unitData = await _unitRepository.Create(unit);
 					if (unitData is null)
 					{
+						await transaction.RollbackAsync();
 						response.StatusCode = StatusCodes.Status400BadRequest;
 						response.Message = StaticValue.ResponseMessage.ErrorSystem;
 						return response;
 					}
 				}
 				// Update Price 
-				var priceData = await _priceRepository.GetById(req.Id);
+				var priceData = await _priceRepository.GetById(req.PriceId);
 				if (priceData is null)
 				{
+					await transaction.RollbackAsync();
 					response.StatusCode = StatusCodes.Status404NotFound;
 					response.Message = StaticValue.ResponseMessage.DataNotFound;
 					return response;
@@ -204,6 +209,7 @@ public class ProductService
 				var edit = await _priceRepository.Update(priceData);
 				if (!edit)
 				{
+					await transaction.RollbackAsync();
 					response.StatusCode = StatusCodes.Status400BadRequest;
 					response.Message = StaticValue.ResponseMessage.ErrorSystem;
 					return response;
@@ -213,6 +219,7 @@ public class ProductService
 			}
 			catch
 			{
+				await transaction.RollbackAsync();
 				response.StatusCode = StatusCodes.Status400BadRequest;
 				response.Message = StaticValue.ResponseMessage.ErrorSystem;
 				return response;
@@ -253,6 +260,7 @@ public class ProductService
 					unitData = await _unitRepository.Create(unit);
 					if (unitData is null)
 					{
+						await transactions.RollbackAsync();
 						response.StatusCode = StatusCodes.Status400BadRequest;
 						response.Message = StaticValue.ResponseMessage.ErrorSystem;
 						return response;
@@ -273,6 +281,7 @@ public class ProductService
 					productData = await _productRepository.Create(product);
 					if (productData is null)
 					{
+						await transactions.RollbackAsync();
 						response.StatusCode = StatusCodes.Status400BadRequest;
 						response.Message = StaticValue.ResponseMessage.ErrorSystem;
 						return response;
@@ -281,6 +290,13 @@ public class ProductService
 				}
 				else
 				{
+					if (productData.Title.Equals(req.Title, StringComparison.OrdinalIgnoreCase))
+					{
+						await transactions.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
 					price.ProductId = productData.Id;
 				}
 				//PRICE PROCESS
@@ -289,17 +305,15 @@ public class ProductService
 				var priceData = await _priceRepository.Create(price);
 				if (priceData is null)
 				{
+					await transactions.RollbackAsync();
 					response.StatusCode = StatusCodes.Status400BadRequest;
 					response.Message = StaticValue.ResponseMessage.ErrorSystem;
 					return response;
 				}
-
 				await transactions.CommitAsync();
-
 				response.StatusCode = StatusCodes.Status200OK;
 				response.Message = StaticValue.ResponseMessage.Success;
 				return response;
-
 			}
 			catch
 			{
