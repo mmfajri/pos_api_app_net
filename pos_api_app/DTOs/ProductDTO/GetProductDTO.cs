@@ -30,7 +30,7 @@ public class GetProductDTO
 	{
 		return new Unit
 		{
-			Name = productDTO.QuantityType
+			Name = productDTO.QuantityType.ToLower()
 		};
 	}
 }

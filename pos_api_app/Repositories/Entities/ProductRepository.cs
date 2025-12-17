@@ -64,11 +64,11 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 	{
 		var query = await (from price in _posDbContext.Prices
 				   join product in _posDbContext.Products on price.ProductId equals product.Id into product_g
-				   from product in product_g.DefaultIfEmpty()
+				   from product in product_g
 				   join unit in _posDbContext.Units on price.UnitId equals unit.Id into unit_g
-				   from unit in unit_g.DefaultIfEmpty()
+				   from unit in unit_g
 				   where product.BarcodeID == BarcodeId &&
-				   (string.IsNullOrEmpty(unitName) || unit.Name.ToLower() == unitName)
+				   (string.IsNullOrEmpty(unitName) || unit.Name == unitName.ToLower())
 				   orderby unit.Id descending
 				   select new GetProductDTO
 				   {

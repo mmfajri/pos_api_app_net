@@ -22,7 +22,7 @@ public class NewProductDTO
 	{
 		return new Unit
 		{
-			Name = productDTO.QuantityType
+			Name = productDTO.QuantityType.ToLower()
 		};
 	}
 	public static explicit operator Price(NewProductDTO productDTO)

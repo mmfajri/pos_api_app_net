@@ -13,12 +13,12 @@ public class UnitRepository : GeneralRepository<Unit>, IUnitRepository
 	}
 	public async Task<Unit?> GetByName(string name)
 	{
-		return await _posDbContext.Set<Unit>().FirstOrDefaultAsync(unit => unit.Name.ToLower() == name.ToLower());
+		return await _posDbContext.Set<Unit>().FirstOrDefaultAsync(unit => unit.Name == name.ToLower());
 	}
 
 	public async Task<bool> IsExits(string name)
 	{
-		return await _posDbContext.Set<Unit>().AnyAsync(unit => unit.Name.ToLower() == name.ToLower());
+		return await _posDbContext.Set<Unit>().AnyAsync(unit => unit.Name == name.ToLower());
 	}
 
 	public async Task<List<InvoiceUnitDTO>?> GetUnitByProductBarcodeId(string barcodeId)
