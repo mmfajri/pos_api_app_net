@@ -15,5 +15,4 @@ public class Product : BaseEntity
 
 	//Cardinality
 	public ICollection<Price>? Prices { get; set; }
-	public ICollection<TransactionItem>? TransactionItems { get; set; }
 }

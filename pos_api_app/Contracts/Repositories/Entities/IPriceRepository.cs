@@ -4,4 +4,5 @@ namespace pos_api_app.Contracts.Repositories.Entities;
 
 public interface IPriceRepository : IGeneralRepository<Price>
 {
+	Task<bool> IsPricesExistByProductAndUnitID(decimal idProduct, decimal idUnit);
 }

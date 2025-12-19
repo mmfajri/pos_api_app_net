@@ -299,7 +299,16 @@ public class ProductService
 					}
 					price.ProductId = productData.Id;
 				}
+
 				//PRICE PROCESS
+				if (await _priceRepository.IsPricesExistByProductAndUnitID((decimal)price.ProductId, (decimal)price.UnitId))
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					return response;
+				}
+
 				price.CreatedTime = DateTime.UtcNow;
 				price.IsDeleted = false;
 				var priceData = await _priceRepository.Create(price);
