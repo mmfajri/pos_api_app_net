@@ -32,6 +32,7 @@ public class CreateInvoiceTransaction
 	public string DateTimeTransaction { get; set; } = string.Empty;
 	public string PosAccount { get; set; } = string.Empty;
 	public decimal? TotalTransaction { get; set; }
+	public decimal? PayTransaction { get; set; }
 	public List<CreateInvoiceTransactionItem>? TransactionItemList { get; set; }
 
 	public static explicit operator Transaction(CreateInvoiceTransaction model)
@@ -41,6 +42,7 @@ public class CreateInvoiceTransaction
 			TransactionsDate = DateTime.Parse(model.DateTimeTransaction),
 			AccountId = int.Parse(model.PosAccount),
 			TotalAmmount = model.TotalTransaction,
+			PayAmount = model.PayTransaction,
 		};
 	}
 }

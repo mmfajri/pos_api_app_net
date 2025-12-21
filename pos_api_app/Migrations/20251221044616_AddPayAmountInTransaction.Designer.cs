@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using pos_api_app.Data;
@@ -11,9 +12,11 @@ using pos_api_app.Data;
 namespace pos_api_app.Migrations
 {
     [DbContext(typeof(PosDbContext))]
-    partial class PosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251221044616_AddPayAmountInTransaction")]
+    partial class AddPayAmountInTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

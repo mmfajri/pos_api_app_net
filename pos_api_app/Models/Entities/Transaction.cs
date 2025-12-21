@@ -15,6 +15,9 @@ public class Transaction : BaseEntity
 	[Column("total_price_amount", TypeName = "decimal(18,2)")]
 	public decimal? TotalAmmount { get; set; }
 
+	[Column("pay_amount", TypeName = "decimal(18,2)")]
+	public decimal? PayAmount { get; set; }
+
 	//Cardinality
 	public ICollection<TransactionItem>? TransactionItems { get; set; }
 	public Account? Account { get; set; }
