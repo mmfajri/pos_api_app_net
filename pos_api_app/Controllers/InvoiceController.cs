@@ -15,6 +15,32 @@ public class InvoiceController : ControllerBase
 		_invoiceService = invoiceService;
 	}
 
+	[HttpPost("[action]")]
+	public async Task<IActionResult> SaveInvoiceTransaction(CreateInvoiceTransaction req)
+	{
+		var response = await _invoiceService.SaveInvoiceTransaction(req);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, response);
+				}
+		}
+	}
+
+
 	[HttpGet("[action]")]
 	public async Task<IActionResult> GetProductPriceByBarcode([FromQuery] InvoiceGetProductPriceDTO req)
 	{

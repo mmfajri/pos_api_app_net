@@ -3,6 +3,7 @@ using pos_api_app.Data;
 using pos_api_app.DTOs.InvoiceDTO;
 using pos_api_app.DTOs.ProductDTO;
 using pos_api_app.DTOs.ResponseDTO;
+using pos_api_app.Models.Entities;
 using pos_api_app.Repository.Entities;
 using pos_api_app.Utilities;
 
@@ -20,6 +21,53 @@ public class InvoiceService
 		_posDbContext = posDbContext;
 		_productRepository = productRepository;
 		_unitRepository = unitRepository;
+	}
+
+	public async Task<ResponseDTO<bool>> SaveInvoiceTransaction(CreateInvoiceTransaction req)
+	{
+		var response = new ResponseDTO<bool>();
+		using var transaction = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			//Save Transaction
+			var transactionsData = (Transaction)req;
+			transactionsData.CreatedTime = DateTime.Now;
+			transactionsData.IsDeleted = false;
+			await _posDbContext.Transactions.AddAsync(transactionsData);
+
+			//Save Transaction Item
+			if (req.TransactionItemList is not null)
+			{
+
+				foreach (var item in req.TransactionItemList)
+				{
+					var transactionItem = (TransactionItem)item;
+					transactionItem.CreatedTime = DateTime.Now;
+					transactionItem.IsDeleted = false;
+					await _posDbContext.TransactionItems.AddAsync(transactionItem);
+				}
+			}
+			else
+			{
+				response.StatusCode = StatusCodes.Status500InternalServerError;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
+			}
+
+			await transaction.CommitAsync();
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = true;
+			return response;
+
+		}
+		catch (Exception ex)
+		{
+
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem + ex.Message + ex.InnerException;
+			return response;
+		}
 	}
 
 	public async Task<ResponseDTO<InvoiceProductDTO>> GetProductPriceByBarcodeId(InvoiceGetProductPriceDTO req)
