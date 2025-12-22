@@ -36,10 +36,10 @@ public class InvoiceService
 			await _posDbContext.Transactions.AddAsync(transactionsData);
 
 			//Save Transaction Item
-			if (req.TransactionItemList is not null)
+			if (req.ListTransactionItems is not null)
 			{
 
-				foreach (var item in req.TransactionItemList)
+				foreach (var item in req.ListTransactionItems)
 				{
 					var transactionItem = (TransactionItem)item;
 					transactionItem.CreatedTime = DateTime.Now;
