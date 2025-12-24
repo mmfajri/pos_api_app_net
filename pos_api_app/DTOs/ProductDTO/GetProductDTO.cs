@@ -4,7 +4,7 @@ namespace pos_api_app.DTOs.ProductDTO;
 
 public class GetProductDTO
 {
-	public int PriceId { get; set; } //--> Must Later to Rename to PriceId to Avoid Confusion
+	public int PriceId { get; set; }
 	public string BarcodeId { get; set; } = string.Empty;
 	public string Title { get; set; } = string.Empty;
 	public string QuantityType { get; set; } = string.Empty;
