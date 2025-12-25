@@ -18,9 +18,9 @@ public class TransactionController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> Get()
+	public async Task<IActionResult> Get([FromQuery] GetTransactionDTO req)
 	{
-		var response = await _transactionService.GetAll();
+		var response = await _transactionService.GetAll(req);
 		switch (response.StatusCode)
 		{
 			case StatusCodes.Status400BadRequest:

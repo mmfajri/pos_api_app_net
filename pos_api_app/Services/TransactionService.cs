@@ -1,5 +1,6 @@
 ﻿using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
+using pos_api_app.DTOs.GeneralDTO;
 using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.DTOs.TransactionsDTO;
 using pos_api_app.DTOs.TransactionsItemDTO;
@@ -34,12 +35,13 @@ public class TransactionService
 		_posDbContext = posDbContext;
 	}
 
-	public async Task<ResponseDTO<IEnumerable<TransactionDTO>>> GetAll()
+	public async Task<ResponseDTO<ResponseTableDTO<TransactionDTO>>> GetAll(GetTransactionDTO req)
 	{
-		var response = new ResponseDTO<IEnumerable<TransactionDTO>>();
-		ICollection<TransactionDTO> transactionDto = new List<TransactionDTO>();
+		var response = new ResponseDTO<ResponseTableDTO<TransactionDTO>>();
+		var data = new ResponseTableDTO<TransactionDTO>();
 		using var trxContext = await _posDbContext.Database.BeginTransactionAsync();
-		var transactions = await _transactionRepository.GetAll();
+
+		var (transactions, count) = await _transactionRepository.GetListPaginated(req);
 		if (transactions == null)
 		{
 			await trxContext.RollbackAsync();
@@ -47,15 +49,16 @@ public class TransactionService
 			response.Message = StaticValue.ResponseMessage.ErrorSystem;
 			return response;
 		}
-		foreach (var transaction in transactions)
-		{
-			transactionDto.Add((TransactionDTO)transaction);
-		}
+		data.TotalRecord = count;
+		data.DataTable = (List<TransactionDTO>?)transactions;
+		data.CurrentPage = req.PageNumber;
+		data.TotalPage = (int)Math.Ceiling(count / (double)req.RowsPerPage);
+
 
 		await trxContext.CommitAsync();
 		response.StatusCode = StatusCodes.Status200OK;
 		response.Message = StaticValue.ResponseMessage.Success;
-		response.Data = transactionDto;
+		response.Data = data;
 		return response;
 	}
 

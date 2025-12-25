@@ -1,3 +1,5 @@
+using pos_api_app.DTOs.TransactionsDTO;
+
 namespace pos_api_app.DTOs.GeneralDTO;
 
 public class TableDTO
@@ -14,4 +16,5 @@ public class ResponseTableDTO<T>
 	public int CurrentPage { get; set; } = 0;
 	public int TotalPage { get; set; } = 0;
 	public List<T>? DataTable { get; set; }
+
 }
