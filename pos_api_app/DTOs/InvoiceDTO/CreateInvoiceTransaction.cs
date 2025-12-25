@@ -10,19 +10,19 @@ public class CreateInvoiceTransactionItem
 	public int? Quantity { get; set; }
 	public decimal? Price { get; set; }
 	public decimal? TotalPrice { get; set; }
-	public string ListUnitItem { get; set; } = string.Empty;
+	public string UnitList { get; set; } = string.Empty;
 
 	public static explicit operator TransactionItem(CreateInvoiceTransactionItem model)
 	{
 		return new TransactionItem
 		{
 			BarcodeId = model.BarcodeId,
-			TitleProduct = model.BarcodeId,
+			TitleProduct = model.Title,
 			QuantityType = model.QuantityType,
 			Quantity = model.Quantity,
 			PriceProduct = model.Price,
 			TotalPrice = model.TotalPrice,
-			UnitList = model.ListUnitItem,
+			UnitList = model.UnitList,
 		};
 	}
 }
@@ -39,7 +39,7 @@ public class CreateInvoiceTransaction
 	{
 		return new Transaction
 		{
-			TransactionsDate = DateTime.Parse(model.TransactionDate),
+			TransactionsDate = DateTime.SpecifyKind(DateTime.Parse(model.TransactionDate), DateTimeKind.Utc),
 			AccountId = model.AccountPos is not null ? model.AccountPos : null,
 			TotalAmmount = model.TotalTransaction,
 			PayAmount = model.PayAmount,

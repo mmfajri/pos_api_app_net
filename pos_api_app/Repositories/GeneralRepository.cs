@@ -43,6 +43,22 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 			return null;
 		}
 	}
+	public async Task<bool> CreateBulk(List<TEntity> entities)
+	{
+		try
+		{
+			foreach (var item in entities)
+			{
+				await _posDbContext.Set<TEntity>().AddAsync(item);
+			}
+			await _posDbContext.SaveChangesAsync();
+			return true;
+		}
+		catch
+		{
+			return false;
+		}
+	}
 
 	public async Task<bool> Update(TEntity entity)
 	{

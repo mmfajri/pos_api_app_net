@@ -13,14 +13,18 @@ namespace pos_api_app.Services;
 public class InvoiceService
 {
 	private readonly PosDbContext _posDbContext;
+	private readonly ITransactionRepository _transactionRepository;
+	private readonly ITransactionItemRepository _transactionItemRepository;
 	private readonly IProductRepository _productRepository;
 	private readonly IUnitRepository _unitRepository;
 
-	public InvoiceService(PosDbContext posDbContext, IProductRepository productRepository, IUnitRepository unitRepository)
+	public InvoiceService(PosDbContext posDbContext, IProductRepository productRepository, IUnitRepository unitRepository, ITransactionRepository transactionRepository, ITransactionItemRepository transactionItemRepository)
 	{
 		_posDbContext = posDbContext;
 		_productRepository = productRepository;
 		_unitRepository = unitRepository;
+		_transactionRepository = transactionRepository;
+		_transactionItemRepository = transactionItemRepository;
 	}
 
 	public async Task<ResponseDTO<bool>> SaveInvoiceTransaction(CreateInvoiceTransaction req)
@@ -31,9 +35,16 @@ public class InvoiceService
 		{
 			//Save Transaction
 			var transactionsData = (Transaction)req;
-			transactionsData.CreatedTime = DateTime.Now;
+			transactionsData.CreatedTime = DateTime.UtcNow;
 			transactionsData.IsDeleted = false;
-			await _posDbContext.Transactions.AddAsync(transactionsData);
+			transactionsData = await _transactionRepository.Create(transactionsData);
+			if (transactionsData is null)
+			{
+				await transaction.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
+			}
 
 			//Save Transaction Item
 			if (req.ListTransactionItems is not null)
@@ -42,9 +53,18 @@ public class InvoiceService
 				foreach (var item in req.ListTransactionItems)
 				{
 					var transactionItem = (TransactionItem)item;
-					transactionItem.CreatedTime = DateTime.Now;
+					transactionItem.TransactionId = transactionsData.Id;
+					transactionItem.CreatedTime = DateTime.UtcNow;
 					transactionItem.IsDeleted = false;
-					await _posDbContext.TransactionItems.AddAsync(transactionItem);
+					transactionItem = await _transactionItemRepository.Create(transactionItem);
+					if (transactionItem is null)
+					{
+
+						await transaction.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
 				}
 			}
 			else
