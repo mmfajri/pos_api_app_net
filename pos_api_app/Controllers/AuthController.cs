@@ -42,9 +42,13 @@ public class AuthController : ControllerBase
 				{
 					return Unauthorized(response);
 				}
-			default:
+			case StatusCodes.Status200OK:
 				{
 					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 

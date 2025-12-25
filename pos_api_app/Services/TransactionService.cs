@@ -1,8 +1,10 @@
 ﻿using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
+using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.DTOs.TransactionsDTO;
 using pos_api_app.DTOs.TransactionsItemDTO;
 using pos_api_app.Models.Entities;
+using pos_api_app.Utilities;
 using System.Data;
 using System.Net;
 
@@ -32,17 +34,29 @@ public class TransactionService
 		_posDbContext = posDbContext;
 	}
 
-	public async Task<IEnumerable<TransactionDTO>?> GetAll()
+	public async Task<ResponseDTO<IEnumerable<TransactionDTO>>> GetAll()
 	{
-		var transactions = await _transactionRepository.GetAll();
-		if (transactions == null) return null;
-
+		var response = new ResponseDTO<IEnumerable<TransactionDTO>>();
 		ICollection<TransactionDTO> transactionDto = new List<TransactionDTO>();
+		using var trxContext = await _posDbContext.Database.BeginTransactionAsync();
+		var transactions = await _transactionRepository.GetAll();
+		if (transactions == null)
+		{
+			await trxContext.RollbackAsync();
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
 		foreach (var transaction in transactions)
 		{
 			transactionDto.Add((TransactionDTO)transaction);
 		}
-		return transactionDto;
+
+		await trxContext.CommitAsync();
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		response.Data = transactionDto;
+		return response;
 	}
 
 	// public async Task<TransactionDTO?> GetDetailTransaction(int id)

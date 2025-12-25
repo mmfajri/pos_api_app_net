@@ -17,27 +17,30 @@ public class TransactionController : ControllerBase
 		_transactionService = transactionService;
 	}
 
-	// [HttpGet]
-	// public async Task<IActionResult> Get()
-	// {
-	// 	var transactions = await _transactionService.GetAll();
-	// 	if (transactions == null)
-	// 	{
-	// 		return NotFound(new ResponseHandler<TransactionDTO>
-	// 		{
-	// 			Code = StatusCodes.Status404NotFound,
-	// 			Status = HttpStatusCode.NotFound.ToString(),
-	// 			Message = "Data Not Found"
-	// 		});
-	// 	}
-	// 	return Ok(new ResponseHandler<IEnumerable<TransactionDTO>>()
-	// 	{
-	// 		Code = StatusCodes.Status200OK,
-	// 		Status = HttpStatusCode.OK.ToString(),
-	// 		Message = "Data Found",
-	// 		Data = transactions
-	// 	});
-	// }
+	[HttpGet]
+	public async Task<IActionResult> Get()
+	{
+		var response = await _transactionService.GetAll();
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
+	}
 	// [HttpGet("{id}")]
 	// public async Task<IActionResult> Get(int id)
 	// {

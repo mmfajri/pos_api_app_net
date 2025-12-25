@@ -40,7 +40,7 @@ public class ProductController : ControllerBase
 				}
 			default:
 				{
-					return StatusCode(StatusCodes.Status500InternalServerError, response);
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
@@ -65,7 +65,7 @@ public class ProductController : ControllerBase
 				}
 			default:
 				{
-					return StatusCode(StatusCodes.Status500InternalServerError, response);
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
@@ -90,7 +90,7 @@ public class ProductController : ControllerBase
 				}
 			default:
 				{
-					return StatusCode(StatusCodes.Status500InternalServerError, response);
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
@@ -109,9 +109,13 @@ public class ProductController : ControllerBase
 				{
 					return Unauthorized(response);
 				}
-			default:
+			case StatusCodes.Status200OK:
 				{
 					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
@@ -134,9 +138,13 @@ public class ProductController : ControllerBase
 				{
 					return NotFound(response);
 				}
-			default:
+			case StatusCodes.Status200OK:
 				{
 					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
@@ -159,9 +167,13 @@ public class ProductController : ControllerBase
 				{
 					return NotFound(response);
 				}
-			default:
+			case StatusCodes.Status200OK:
 				{
 					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}

@@ -35,7 +35,7 @@ public class InvoiceController : ControllerBase
 				}
 			default:
 				{
-					return StatusCode(StatusCodes.Status500InternalServerError, response);
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
@@ -61,7 +61,7 @@ public class InvoiceController : ControllerBase
 				}
 			default:
 				{
-					return StatusCode(StatusCodes.Status500InternalServerError, response);
+					return StatusCode(response.StatusCode, response);
 				}
 		}
 	}
