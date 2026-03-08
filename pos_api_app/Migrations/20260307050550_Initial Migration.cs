@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace pos_api_app.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDatabase : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -149,6 +149,7 @@ namespace pos_api_app.Migrations
                     account_id = table.Column<int>(type: "integer", nullable: true),
                     transaction_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     total_price_amount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    pay_amount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
                     TransactionId = table.Column<int>(type: "integer", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

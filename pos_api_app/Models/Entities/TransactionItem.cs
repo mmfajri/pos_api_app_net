@@ -20,7 +20,7 @@ public class TransactionItem : BaseEntity
 	public string? QuantityType { get; set; }
 
 	[Column("quantity")]
-	public int? Quantity { get; set; }
+	public decimal? Quantity { get; set; }
 
 	[Column("price_product", TypeName = "decimal(18,2)")]
 	public decimal? PriceProduct { get; set; }

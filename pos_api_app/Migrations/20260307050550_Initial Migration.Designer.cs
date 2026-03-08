@@ -12,8 +12,8 @@ using pos_api_app.Data;
 namespace pos_api_app.Migrations
 {
     [DbContext(typeof(PosDbContext))]
-    [Migration("20251219033958_InitialDatabase")]
-    partial class InitialDatabase
+    [Migration("20260307050550_Initial Migration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -247,6 +247,10 @@ namespace pos_api_app.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
+
+                    b.Property<decimal?>("PayAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("pay_amount");
 
                     b.Property<decimal?>("TotalAmmount")
                         .HasColumnType("decimal(18,2)")
