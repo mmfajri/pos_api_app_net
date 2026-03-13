@@ -56,7 +56,7 @@ public class TransactionRepository : GeneralRepository<Transaction>, ITransactio
 		return (data, totalData);
 	}
 
-	private static Expression<Func<Transaction, object>> GetEntitySortExpression(string sortColumn)
+	private static Expression<Func<Transaction, object?>> GetEntitySortExpression(string sortColumn)
 	{
 		return sortColumn?.ToLower() switch
 		{

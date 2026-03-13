@@ -54,29 +54,33 @@ public class TransactionService
 				return response;
 			}
 
-			//Mapping the TransactionItemDto to TransactionItemTable
-			foreach (var item in req.TransactionItemDTOs)
+
+			if (req.TransactionItemDTOs is not null)
 			{
-				var itemTransaction = (TransactionItem)item;
-				itemTransaction.TransactionId = dataTransaction.Id;
-				var dataItemTransaction = _transactionItemRepository.Create(itemTransaction);
-				if (dataItemTransaction is null)
+				//Mapping the TransactionItemDto to TransactionItemTable
+				foreach (var item in req.TransactionItemDTOs)
 				{
-					await trxDb.RollbackAsync();
-					response.StatusCode = StatusCodes.Status400BadRequest;
-					response.Message = StaticValue.ResponseMessage.ErrorSystem;
-					response.Data = false;
-					return response;
+					var itemTransaction = (TransactionItem)item;
+					itemTransaction.TransactionId = dataTransaction.Id;
+					var dataItemTransaction = _transactionItemRepository.Create(itemTransaction);
+					if (dataItemTransaction is null)
+					{
+						await trxDb.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						response.Data = false;
+						return response;
+					}
 				}
 			}
-
 			await trxDb.CommitAsync();
 
 		}
 		catch (Exception ex)
 		{
 			await trxDb.RollbackAsync();
-
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem + $" {ex}";
 			return response;
 		}
 		return response;

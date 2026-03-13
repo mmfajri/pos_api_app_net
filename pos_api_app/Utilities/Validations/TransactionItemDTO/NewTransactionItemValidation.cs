@@ -17,19 +17,14 @@ public class NewTransactionItemValidation : AbstractValidator<NewTransactionItem
 		RuleFor(attr => attr.Quantity)
 		    .NotEmpty().WithMessage("Quantity is required")
 		    .GreaterThanOrEqualTo(0).WithMessage("Quantity must greater than or equal to 0")
-		    .Must(OnlyNumberHandler<float>.ValidNumber).WithMessage("Quantity should contain only numbers, dots, or commas");
+		    .Must(OnlyNumberHandler<decimal?>.ValidNumber).WithMessage("Quantity should contain only numbers, dots, or commas");
 
-		RuleFor(attr => attr.Subtotal)
+		RuleFor(attr => attr.TotalPrice)
 		    .NotEmpty().WithMessage("Subtotal is required")
 		    .GreaterThanOrEqualTo(0).WithMessage("Subtotal must greater than or equal to 0")
-		    .Must(OnlyNumberHandler<decimal>.ValidNumber).WithMessage("Subtotal should contain only numbers, dots, or commas");
-		RuleFor(attr => attr.PriceId)
+		    .Must(OnlyNumberHandler<decimal?>.ValidNumber).WithMessage("Subtotal should contain only numbers, dots, or commas");
+		RuleFor(attr => attr.PriceProduct)
 		    .NotEmpty().WithMessage("Price must not empty")
-		    .Must(id => id.HasValue).WithMessage("Price must have value")
-		    .MustAsync(async (id, cancellation) =>
-		    {
-			    return id.HasValue && await _repository.IsProductExist(id.Value);
-		    })
-		    .WithMessage("Price is not exit");
+		    .Must(OnlyNumberHandler<decimal?>.ValidNumber).WithMessage("Price must have value");
 	}
 }
