@@ -153,6 +153,8 @@ public class TransactionService
 		return response;
 	}
 
+	public async Task<ResponseDTO<bool>> UpdateTransaction()
+
 
 
 	public async Task<int> Delete(int id)
