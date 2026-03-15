@@ -16,5 +16,4 @@ public class ResponseTableDTO<T>
 	public int CurrentPage { get; set; } = 0;
 	public int TotalPage { get; set; } = 0;
 	public List<T>? DataTable { get; set; }
-
 }

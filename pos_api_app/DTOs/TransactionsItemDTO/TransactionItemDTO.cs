@@ -4,26 +4,26 @@ namespace pos_api_app.DTOs.TransactionsItemDTO;
 
 public class TransactionItemDTO
 {
-	public int Id { get; set; }
-	public int? TransactionId { get; set; }
-	public int? ProductId { get; set; }
-	public int? PriceId { get; set; }
-	public float Quantity { get; set; }
-	public decimal SubTotal { get; set; }
+	public string? BarcodeId { get; set; }
+	public string? TitleProduct { get; set; }
+	public string? QuantityType { get; set; }
+	public decimal? Quantity { get; set; }
+	public decimal? PriceProduct { get; set; }
+	public decimal? TotalPrice { get; set; }
 
-	// public static explicit operator TransactionItemDTO(TransactionItem transactionItem)
-	// {
-	//     return new TransactionItemDTO
-	//     {
-	//         Id = transactionItem.Id,
-	//         TransactionId = transactionItem.TransactionId,
-	//         ProductId = transactionItem.ProductId,
-	//         PriceId = transactionItem.PriceId,
-	//         Quantity = transactionItem.Quantity,
-	//         SubTotal = transactionItem.Subtotal
-	//     };
-	// }
-	//
+	public static explicit operator TransactionItemDTO(TransactionItem transactionItem)
+	{
+		return new TransactionItem
+		{
+			BarcodeId = transactionItem.BarcodeId,
+			TitleProduct = transactionItem.TitleProduct,
+			QuantityType = transactionItem.QuantityType,
+			Quantity = transactionItem.Quantity,
+			PriceProduct = transactionItem.PriceProduct,
+			TotalPrice = transactionItem.TotalPrice,
+		};
+	}
+
 	// public static explicit operator TransactionItem(TransactionItemDTO transactionItem)
 	// {
 	//     return new TransactionItem

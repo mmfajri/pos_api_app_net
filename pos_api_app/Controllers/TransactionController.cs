@@ -41,28 +41,31 @@ public class TransactionController : ControllerBase
 				}
 		}
 	}
-	// [HttpGet("{id}")]
-	// public async Task<IActionResult> Get(int id)
-	// {
-	// 	var transaction = await _transactionService.GetDetailTransaction(id);
-	// 	if (transaction == null)
-	// 	{
-	// 		return NotFound(new ResponseHandler<TransactionDTO>()
-	// 		{
-	// 			Code = StatusCodes.Status404NotFound,
-	// 			Status = HttpStatusCode.NotFound.ToString(),
-	// 			Message = "Data Not Found"
-	// 		});
-	// 	}
-	// 	return Ok(new ResponseHandler<TransactionDTO>
-	// 	{
-	// 		Code = StatusCodes.Status200OK,
-	// 		Status = HttpStatusCode.OK.ToString(),
-	// 		Message = "Data Found",
-	// 		Data = transaction
-	// 	});
-	// }
-	//
+
+	[HttpGet("{req}")]
+	public async Task<IActionResult> GetTransactionDetail([FromQuery] long req)
+	{
+		var response = await _transactionService.GetDetailTransaction(req);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
+	}
 	// [HttpPost("AddTransaction/")]
 	// public async Task<IActionResult> AddTransaction(NewTransactionDTO transactionDTO)
 	// {

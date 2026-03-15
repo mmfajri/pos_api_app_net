@@ -86,6 +86,46 @@ public class TransactionService
 		return response;
 	}
 
+	public async Task<ResponseDTO<ResponseTableDTO<TransactionItemDTO>>> GetDetailTransaction(long id)
+	{
+		var response = new ResponseDTO<ResponseTableDTO<TransactionItemDTO>>();
+		var data = new ResponseTableDTO<TransactionItemDTO>();
+
+		using var trxContext = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			var transactionItemList = await _transactionItemRepository.GetByTransactionsId((int)id);
+			if (transactionItemList is null || transactionItemList.Count() == 0)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				return response;
+			}
+
+			foreach (var item in transactionItemList)
+			{
+				if (item is not null)
+				{
+					var itemDto = (TransactionItemDTO)item;
+					data.DataTable!.Add(itemDto);
+				}
+			}
+			data.CurrentPage = 1;
+			data.TotalRecord = transactionItemList.Count();
+			data.TotalPage = 1;
+
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			return response;
+		}
+		catch
+		{
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
+	}
+
 	public async Task<ResponseDTO<ResponseTableDTO<TransactionDTO>>> GetAll(GetTransactionDTO req)
 	{
 		var response = new ResponseDTO<ResponseTableDTO<TransactionDTO>>();
