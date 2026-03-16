@@ -153,9 +153,67 @@ public class TransactionService
 		return response;
 	}
 
-	public async Task<ResponseDTO<bool>> UpdateTransaction()
+	public async Task<ResponseDTO<bool>> UpdateTransactionItems(UpdateTransactionItemDTO req)
+	{
+		var response = new ResponseDTO<bool>();
 
+		using var trxDb = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			// Check if transaction exists
+			var isExist = await _transactionRepository.IsExits(req.TransactionId);
+			if (!isExist)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				response.Data = false;
+				return response;
+			}
 
+			// Force delete all existing transaction items for this transaction
+			var deleteResult = await _transactionItemRepository.DeleteByTransactionId(req.TransactionId);
+			if (!deleteResult)
+			{
+				await trxDb.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				response.Data = false;
+				return response;
+			}
+
+			// Add new transaction items from request
+			if (req.ListTransactionItem is not null)
+			{
+				foreach (var item in req.ListTransactionItem)
+				{
+					var transactionItem = (TransactionItem)item;
+					transactionItem.TransactionId = req.TransactionId;
+					var created = _transactionItemRepository.Create(transactionItem);
+					if (created is null)
+					{
+						await trxDb.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						response.Data = false;
+						return response;
+					}
+				}
+			}
+
+			await trxDb.CommitAsync();
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = true;
+		}
+		catch (Exception ex)
+		{
+			await trxDb.RollbackAsync();
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem + $" {ex}";
+			response.Data = false;
+		}
+		return response;
+	}
 
 	public async Task<int> Delete(int id)
 	{

@@ -1,4 +1,5 @@
 ﻿using pos_api_app.DTOs.TransactionsDTO;
+using pos_api_app.DTOs.TransactionsItemDTO;
 using pos_api_app.Services;
 using pos_api_app.Utilities.Handlers;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +67,31 @@ public class TransactionController : ControllerBase
 				}
 		}
 	}
+	[HttpPut("UpdateTransactionItems")]
+	public async Task<IActionResult> UpdateTransactionItems([FromBody] UpdateTransactionItemDTO req)
+	{
+		var response = await _transactionService.UpdateTransactionItems(req);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
+	}
+
 	// [HttpPost("AddTransaction/")]
 	// public async Task<IActionResult> AddTransaction(NewTransactionDTO transactionDTO)
 	// {

@@ -15,4 +15,24 @@ public class TransactionItemRepository : GeneralRepository<TransactionItem>, ITr
 	{
 		return await _posDbContext.Set<TransactionItem>().Where(x => x.TransactionId == id).ToListAsync();
 	}
+
+	public async Task<bool> DeleteByTransactionId(int transactionId)
+	{
+		try
+		{
+			var items = await _posDbContext.Set<TransactionItem>()
+				.Where(x => x.TransactionId == transactionId)
+				.ToListAsync();
+			if (items.Any())
+			{
+				_posDbContext.Set<TransactionItem>().RemoveRange(items);
+				await _posDbContext.SaveChangesAsync();
+			}
+			return true;
+		}
+		catch
+		{
+			return false;
+		}
+	}
 }
