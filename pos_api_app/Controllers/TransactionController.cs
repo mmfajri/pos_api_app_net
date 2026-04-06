@@ -92,28 +92,51 @@ public class TransactionController : ControllerBase
 		}
 	}
 
-	// [HttpPost("AddTransaction/")]
-	// public async Task<IActionResult> AddTransaction(NewTransactionDTO transactionDTO)
-	// {
-	// 	var transaction = await _transactionService.Create(transactionDTO);
-	// 	if (transaction == null)
-	// 	{
-	// 		return BadRequest(new ResponseHandler<TransactionDTO>()
-	// 		{
-	// 			Code = StatusCodes.Status400BadRequest,
-	// 			Status = HttpStatusCode.BadRequest.ToString(),
-	// 			Message = "Failed to Create Data"
-	// 		});
-	// 	}
-	// 	return Ok(new ResponseHandler<TransactionDTO>
-	// 	{
-	// 		Code = StatusCodes.Status200OK,
-	// 		Status = HttpStatusCode.OK.ToString(),
-	// 		Message = "Data Successfully Created",
-	// 		Data = transaction
-	// 	});
-	// }
-	//
+	[HttpPut("Delete")]
+	public async Task<IActionResult> Delete([FromBody] int id)
+	{
+		var response = await _transactionService.Delete(id);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
+	}
+	[HttpPost("AddTransaction/")]
+	public async Task<IActionResult> AddTransaction(NewTransactionDTO transactionDTO)
+	{
+		var transaction = await _transactionService.Create(transactionDTO);
+		if (transaction == null)
+		{
+			return BadRequest(new ResponseHandler<TransactionDTO>()
+			{
+				Code = StatusCodes.Status400BadRequest,
+				Status = HttpStatusCode.BadRequest.ToString(),
+				Message = "Failed to Create Data"
+			});
+		}
+		return Ok(new ResponseHandler<TransactionDTO>
+		{
+			Code = StatusCodes.Status200OK,
+			Status = HttpStatusCode.OK.ToString(),
+			Message = "Data Successfully Created",
+		});
+	}
+
 	// [HttpPut("UpdateTransaction/")]
 	// public async Task<IActionResult> UpdateTransaction(TransactionDTO transactionDTO)
 	// {
@@ -140,35 +163,6 @@ public class TransactionController : ControllerBase
 	// 		Code = StatusCodes.Status200OK,
 	// 		Status = HttpStatusCode.OK.ToString(),
 	// 		Message = "Data Successfully Edited"
-	// 	});
-	// }
-	//
-	// [HttpDelete("DeleteTransaction")]
-	// public async Task<IActionResult> DeleteTransaction(int id)
-	// {
-	// 	var isDelete = await _transactionService.Delete(id);
-	// 	switch (isDelete)
-	// 	{
-	// 		case (int)HttpStatusCode.BadRequest:
-	// 			return BadRequest(new ResponseHandler<TransactionDTO>()
-	// 			{
-	// 				Code = StatusCodes.Status400BadRequest,
-	// 				Status = HttpStatusCode.BadRequest.ToString(),
-	// 				Message = "Data Failed to Delete"
-	// 			});
-	// 		case (int)HttpStatusCode.NotFound:
-	// 			return NotFound(new ResponseHandler<TransactionDTO>()
-	// 			{
-	// 				Code = StatusCodes.Status404NotFound,
-	// 				Status = HttpStatusCode.NotFound.ToString(),
-	// 				Message = "Data Not Found"
-	// 			});
-	// 	}
-	// 	return Ok(new ResponseHandler<TransactionDTO>
-	// 	{
-	// 		Code = StatusCodes.Status200OK,
-	// 		Status = HttpStatusCode.OK.ToString(),
-	// 		Message = "Data Successfully Delete"
 	// 	});
 	// }
 }

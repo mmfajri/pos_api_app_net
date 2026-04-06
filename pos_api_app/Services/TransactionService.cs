@@ -215,51 +215,63 @@ public class TransactionService
 		return response;
 	}
 
-	public async Task<int> Delete(int id)
+	public async Task<ResponseDTO<bool>> Delete(int id)
 	{
+
+		var response = new ResponseDTO<bool>();
 		using (var transactionContext = await _posDbContext.Database.BeginTransactionAsync())
 		{
 			try
 			{
 				//Check Existing Transactions
 				var isExist = await _transactionRepository.IsExits(id);
-				if (isExist == false) return (int)HttpStatusCode.NotFound;
+				if (isExist == false)
+				{
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
 				var getTransaction = await _transactionRepository.GetById(id)!;
 
 				//Delete TransactionsItem
 				if (getTransaction is not null)
 				{
-					// if (getTransaction.TransactionItems != null)
-					// {
-					// 	var getTransactionItem = await _transactionItemRepository.GetByTransactionsId(id)!;
-					// 	if (getTransactionItem is not null)
-					// 	{
-					// 		foreach (var transactionItem in getTransactionItem)
-					// 		{
-					// 			var deleteTransactionItem = await _transactionItemRepository.Delete(transactionItem);
-					// 			if (!deleteTransactionItem)
-					// 			{
-					// 				await transactionContext.RollbackAsync();
-					// 				return (int)HttpStatusCode.BadRequest;
-					// 			}
-					// 		}
-					// 	}
-					// }
+					var getTransactionItem = await _transactionItemRepository.GetByTransactionsId(id);
+					if (getTransactionItem is not null)
+					{
+						foreach (var item in getTransactionItem)
+						{
+							var deleteTransactionItem = await _transactionItemRepository.Delete(item);
+							if (!deleteTransactionItem)
+							{
+								await transactionContext.RollbackAsync();
+								response.StatusCode = StatusCodes.Status400BadRequest;
+								response.Message = StaticValue.ResponseMessage.ErrorSystem;
+								return response;
+							}
+						}
+					}
 					//Delete Transaction
 					var deleteTransaction = await _transactionRepository.Delete(getTransaction);
 					if (!deleteTransaction)
 					{
 						await transactionContext.RollbackAsync();
-						return (int)HttpStatusCode.BadRequest;
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
 					}
 				}
 				await transactionContext.CommitAsync();
-				return (int)HttpStatusCode.OK;
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				return response;
 			}
 			catch
 			{
 				await transactionContext.CommitAsync();
-				return (int)HttpStatusCode.BadRequest;
+				response.StatusCode = StatusCodes.Status500InternalServerError;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
 			}
 		}
 	}
