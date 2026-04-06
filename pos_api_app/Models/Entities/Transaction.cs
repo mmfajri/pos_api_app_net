@@ -19,8 +19,7 @@ public class Transaction : BaseEntity
 	public decimal? PayAmount { get; set; }
 
 	//Cardinality
-	public ICollection<TransactionItem>? TransactionItems { get; set; }
 	public Account? Account { get; set; }
-
-	public ICollection<Transaction>? Transactions { get; set; }
+	//No need Relationship for better performance
+	// public ICollection<TransactionItem>? TransactionItems { get; set; }
 }

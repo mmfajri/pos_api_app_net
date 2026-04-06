@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace pos_api_app.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial_Migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,6 +59,29 @@ namespace pos_api_app.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tb_m_unit", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "tb_tr_transaction_item",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    transaction_id = table.Column<int>(type: "integer", nullable: true),
+                    barcode_id = table.Column<string>(type: "varchar(255)", nullable: true),
+                    title_product = table.Column<string>(type: "varchar(255)", nullable: true),
+                    quantity_type = table.Column<string>(type: "varchar(200)", nullable: true),
+                    quantity = table.Column<decimal>(type: "numeric", nullable: true),
+                    price_product = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    total_price_product = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
+                    unit_List = table.Column<string>(type: "varchar(255)", nullable: true),
+                    created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tb_tr_transaction_item", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -150,7 +173,6 @@ namespace pos_api_app.Migrations
                     transaction_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     total_price_amount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
                     pay_amount = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
-                    TransactionId = table.Column<int>(type: "integer", nullable: true),
                     created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: true)
@@ -162,40 +184,6 @@ namespace pos_api_app.Migrations
                         name: "FK_tb_tr_transaction_tb_m_account_account_id",
                         column: x => x.account_id,
                         principalTable: "tb_m_account",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_tb_tr_transaction_tb_tr_transaction_TransactionId",
-                        column: x => x.TransactionId,
-                        principalTable: "tb_tr_transaction",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "tb_tr_transaction_item",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    transaction_id = table.Column<int>(type: "integer", nullable: true),
-                    barcode_id = table.Column<string>(type: "varchar(255)", nullable: true),
-                    title_product = table.Column<string>(type: "varchar(255)", nullable: true),
-                    quantity_type = table.Column<string>(type: "varchar(200)", nullable: true),
-                    quantity = table.Column<int>(type: "integer", nullable: true),
-                    price_product = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
-                    total_price_product = table.Column<decimal>(type: "numeric(18,2)", nullable: true),
-                    unit_List = table.Column<string>(type: "varchar(255)", nullable: true),
-                    created_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    updated_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_tb_tr_transaction_item", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_tb_tr_transaction_item_tb_tr_transaction_transaction_id",
-                        column: x => x.transaction_id,
-                        principalTable: "tb_tr_transaction",
                         principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
                 });
@@ -243,16 +231,6 @@ namespace pos_api_app.Migrations
                 name: "IX_tb_tr_transaction_account_id",
                 table: "tb_tr_transaction",
                 column: "account_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_tb_tr_transaction_TransactionId",
-                table: "tb_tr_transaction",
-                column: "TransactionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_tb_tr_transaction_item_transaction_id",
-                table: "tb_tr_transaction_item",
-                column: "transaction_id");
         }
 
         /// <inheritdoc />
@@ -265,6 +243,9 @@ namespace pos_api_app.Migrations
                 name: "tb_tr_price");
 
             migrationBuilder.DropTable(
+                name: "tb_tr_transaction");
+
+            migrationBuilder.DropTable(
                 name: "tb_tr_transaction_item");
 
             migrationBuilder.DropTable(
@@ -272,9 +253,6 @@ namespace pos_api_app.Migrations
 
             migrationBuilder.DropTable(
                 name: "tb_m_unit");
-
-            migrationBuilder.DropTable(
-                name: "tb_tr_transaction");
 
             migrationBuilder.DropTable(
                 name: "tb_m_account");

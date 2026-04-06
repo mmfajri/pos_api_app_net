@@ -31,6 +31,7 @@ public class TransactionItem : BaseEntity
 	[Column("unit_List", TypeName = "varchar(255)")]
 	public string? UnitList { get; set; }
 
+	//No Need for fastes performance
 	//Cardinality
-	public Transaction? Transaction { get; set; }
+	// public Transaction? Transaction { get; set; }
 }

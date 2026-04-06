@@ -2,7 +2,6 @@
 using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using pos_api_app.Utilities;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace pos_api_app.Data;
 
@@ -104,11 +103,12 @@ public class PosDbContext : DbContext
 			.OnDelete(DeleteBehavior.SetNull);
 
 		// Transaction
-		modelBuilder.Entity<Transaction>()
-			.HasMany(transaction => transaction.TransactionItems)
-			.WithOne(transactionItem => transactionItem.Transaction)
-			.HasForeignKey(transactionItem => transactionItem.TransactionId)
-			.OnDelete(DeleteBehavior.SetNull);
+		// modelBuilder.Entity<Transaction>()
+		// 	.HasMany(transaction => transaction.TransactionItems)
+		// 	.WithOne(transactionItem => transactionItem.Transaction)
+		// 	.HasForeignKey(transactionItem => transactionItem.TransactionId)
+		// 	.OnDelete(DeleteBehavior.SetNull);
+		//
 		modelBuilder.Entity<Transaction>()
 			.HasOne(transaction => transaction.Account)
 			.WithMany(account => account.Transactions)
@@ -116,11 +116,11 @@ public class PosDbContext : DbContext
 			.OnDelete(DeleteBehavior.SetNull);
 
 		// Transaction Item
-		modelBuilder.Entity<TransactionItem>()
-		    .HasOne(TransactionItem => TransactionItem.Transaction)
-		    .WithMany(transaction => transaction.TransactionItems)
-		    .HasForeignKey(transactions_item => transactions_item.TransactionId)
-		    .OnDelete(DeleteBehavior.SetNull);
+		// modelBuilder.Entity<TransactionItem>()
+		//     .HasOne(TransactionItem => TransactionItem.Transaction)
+		//     .WithMany(transaction => transaction.TransactionItems)
+		//     .HasForeignKey(transactions_item => transactions_item.TransactionId)
+		//     .OnDelete(DeleteBehavior.SetNull);
 
 		//Unit 
 		modelBuilder.Entity<Unit>()

@@ -229,22 +229,22 @@ public class TransactionService
 				//Delete TransactionsItem
 				if (getTransaction is not null)
 				{
-					if (getTransaction.TransactionItems != null)
-					{
-						var getTransactionItem = await _transactionItemRepository.GetByTransactionsId(id)!;
-						if (getTransactionItem is not null)
-						{
-							foreach (var transactionItem in getTransactionItem)
-							{
-								var deleteTransactionItem = await _transactionItemRepository.Delete(transactionItem);
-								if (!deleteTransactionItem)
-								{
-									await transactionContext.RollbackAsync();
-									return (int)HttpStatusCode.BadRequest;
-								}
-							}
-						}
-					}
+					// if (getTransaction.TransactionItems != null)
+					// {
+					// 	var getTransactionItem = await _transactionItemRepository.GetByTransactionsId(id)!;
+					// 	if (getTransactionItem is not null)
+					// 	{
+					// 		foreach (var transactionItem in getTransactionItem)
+					// 		{
+					// 			var deleteTransactionItem = await _transactionItemRepository.Delete(transactionItem);
+					// 			if (!deleteTransactionItem)
+					// 			{
+					// 				await transactionContext.RollbackAsync();
+					// 				return (int)HttpStatusCode.BadRequest;
+					// 			}
+					// 		}
+					// 	}
+					// }
 					//Delete Transaction
 					var deleteTransaction = await _transactionRepository.Delete(getTransaction);
 					if (!deleteTransaction)

@@ -12,8 +12,8 @@ using pos_api_app.Data;
 namespace pos_api_app.Migrations
 {
     [DbContext(typeof(PosDbContext))]
-    [Migration("20260307050550_Initial Migration")]
-    partial class InitialMigration
+    [Migration("20260406093404_Initial_Migration")]
+    partial class Initial_Migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -256,9 +256,6 @@ namespace pos_api_app.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("total_price_amount");
 
-                    b.Property<int?>("TransactionId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("TransactionsDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("transaction_date");
@@ -270,8 +267,6 @@ namespace pos_api_app.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
-
-                    b.HasIndex("TransactionId");
 
                     b.ToTable("tb_tr_transaction");
                 });
@@ -301,8 +296,8 @@ namespace pos_api_app.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("price_product");
 
-                    b.Property<int?>("Quantity")
-                        .HasColumnType("integer")
+                    b.Property<decimal?>("Quantity")
+                        .HasColumnType("numeric")
                         .HasColumnName("quantity");
 
                     b.Property<string>("QuantityType")
@@ -330,8 +325,6 @@ namespace pos_api_app.Migrations
                         .HasColumnName("updated_time");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TransactionId");
 
                     b.ToTable("tb_tr_transaction_item");
                 });
@@ -414,21 +407,7 @@ namespace pos_api_app.Migrations
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("pos_api_app.Models.Entities.Transaction", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("TransactionId");
-
                     b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("pos_api_app.Models.Entities.TransactionItem", b =>
-                {
-                    b.HasOne("pos_api_app.Models.Entities.Transaction", "Transaction")
-                        .WithMany("TransactionItems")
-                        .HasForeignKey("TransactionId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Account", b =>
@@ -446,13 +425,6 @@ namespace pos_api_app.Migrations
             modelBuilder.Entity("pos_api_app.Models.Entities.Role", b =>
                 {
                     b.Navigation("Accounts");
-                });
-
-            modelBuilder.Entity("pos_api_app.Models.Entities.Transaction", b =>
-                {
-                    b.Navigation("TransactionItems");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("pos_api_app.Models.Entities.Unit", b =>
