@@ -214,11 +214,17 @@ public class ProductService
 					response.Message = StaticValue.ResponseMessage.ErrorSystem;
 					return response;
 				}
+
 				await transaction.CommitAsync();
+
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				response.Data = true;
 				return response;
 			}
-			catch
+			catch (Exception ex)
 			{
+				Console.WriteLine(ex.ToString());
 				await transaction.RollbackAsync();
 				response.StatusCode = StatusCodes.Status400BadRequest;
 				response.Message = StaticValue.ResponseMessage.ErrorSystem;
