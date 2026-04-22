@@ -43,7 +43,7 @@ public class TransactionController : ControllerBase
 		}
 	}
 
-	[HttpGet("{req}")]
+	[HttpGet("Detail")]
 	public async Task<IActionResult> GetTransactionDetail([FromQuery] long req)
 	{
 		var response = await _transactionService.GetDetailTransaction(req);
