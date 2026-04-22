@@ -44,7 +44,7 @@ public class TransactionService
 		{
 			//Map the TransactionDTO to TransactionTable
 			var transaction = (Transaction)req;
-			var dataTransaction = _transactionRepository.Create(transaction);
+			var dataTransaction = await _transactionRepository.Create(transaction);
 			if (dataTransaction is null)
 			{
 				await trxDb.RollbackAsync();
@@ -116,6 +116,7 @@ public class TransactionService
 
 			response.StatusCode = StatusCodes.Status200OK;
 			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = data;
 			return response;
 		}
 		catch
@@ -268,7 +269,7 @@ public class TransactionService
 			}
 			catch
 			{
-				await transactionContext.CommitAsync();
+				await transactionContext.RollbackAsync();
 				response.StatusCode = StatusCodes.Status500InternalServerError;
 				response.Message = StaticValue.ResponseMessage.ErrorSystem;
 				return response;
