@@ -11,4 +11,5 @@ public interface IProductRepository : IGeneralRepository<Product>
 	Task<bool> IsProductExist(int id);
 	Task<(List<GetProductDTO>?, int)> GetProduct(ProductTableDTO product);
 	Task<GetProductDTO?> GetSingleProductPriceByBarcodeId(string BarcodeId, string? unitName);
+	Task<List<ProductDTODropdown>> GetProductPriceDropdown();
 }

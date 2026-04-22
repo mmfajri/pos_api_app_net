@@ -31,6 +31,21 @@ public class ProductRepository : GeneralRepository<Product>, IProductRepository
 		return await _posDbContext.Set<Product>().AnyAsync(product => product.Id == id);
 	}
 
+	public async Task<List<ProductDTODropdown>> GetProductPriceDropdown()
+	{
+		var dataPriceProduct = await (from price in _posDbContext.Prices
+					      join product in _posDbContext.Products on price.ProductId equals product.Id into product_g
+					      from product in product_g
+					      where price.IsDeleted != true
+					      select new ProductDTODropdown
+					      {
+						      BarcodeId = product.BarcodeID,
+						      Title = product.Title,
+					      }).Distinct().ToListAsync();
+
+		return dataPriceProduct;
+	}
+
 	public async Task<(List<GetProductDTO>?, int)> GetProduct(ProductTableDTO product)
 	{
 		var connection = _posDbContext.Database.GetDbConnection();

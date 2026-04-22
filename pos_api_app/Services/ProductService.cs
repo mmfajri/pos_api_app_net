@@ -62,18 +62,13 @@ public class ProductService
 
 		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
 		{
-			var dataProduct = await _productRepository.GetAll();
-			if (dataProduct is null)
+			dataDropdown = await _productRepository.GetProductPriceDropdown();
+			if (dataDropdown is null || dataDropdown.Count == 0)
 			{
 				response.StatusCode = StatusCodes.Status404NotFound;
 				response.Message = StaticValue.ResponseMessage.DataNotFound;
 				response.Data = null;
 				return response;
-			}
-			foreach (var item in dataProduct)
-			{
-				var data = (ProductDTODropdown)item;
-				dataDropdown.Add(data);
 			}
 		}
 		response.StatusCode = StatusCodes.Status200OK;
