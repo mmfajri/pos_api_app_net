@@ -1,27 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using pos_api_app.Contracts.Repositories;
 using pos_api_app.Data;
+using pos_api_app.Models;
+using pos_api_app.Utilities;
 
 namespace pos_api_app.Repository;
 
 public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
-    where TEntity : class
+    where TEntity : BaseEntity
 {
 	protected readonly PosDbContext _posDbContext;
+	protected readonly ILogger<TEntity>? _logger;
 
-	public GeneralRepository(PosDbContext posDbContext)
+	public GeneralRepository(PosDbContext posDbContext, ILogger<TEntity>? logger = null)
 	{
 		_posDbContext = posDbContext;
+		_logger = logger is not null ? logger : null;
 	}
 
 	public async Task<IEnumerable<TEntity>> GetAll()
 	{
-		return await _posDbContext.Set<TEntity>().ToListAsync();
+		return await _posDbContext.Set<TEntity>().Where(e => e.IsDeleted != true).OrderByDescending(e => e.CreatedTime).ToListAsync();
 	}
 
-	public async Task<TEntity?> GetByGuid(Guid guid)
+	public async Task<TEntity?> GetById(int id)
 	{
-		var entity = await _posDbContext.Set<TEntity>().FindAsync(guid);
+		var entity = await _posDbContext.Set<TEntity>().Where(e => e.IsDeleted != true && e.Id == id).FirstOrDefaultAsync();
 		_posDbContext.ChangeTracker.Clear();
 		return entity;
 	}
@@ -37,6 +41,22 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 		catch
 		{
 			return null;
+		}
+	}
+	public async Task<bool> CreateBulk(List<TEntity> entities)
+	{
+		try
+		{
+			foreach (var item in entities)
+			{
+				await _posDbContext.Set<TEntity>().AddAsync(item);
+			}
+			await _posDbContext.SaveChangesAsync();
+			return true;
+		}
+		catch
+		{
+			return false;
 		}
 	}
 
@@ -67,9 +87,9 @@ public class GeneralRepository<TEntity> : IGeneralRepository<TEntity>
 		}
 	}
 
-	public async Task<bool> IsExits(Guid guid)
+	public async Task<bool> IsExits(int id)
 	{
-		return await GetByGuid(guid) != null;
+		return await GetById(id) != null;
 	}
 
 }

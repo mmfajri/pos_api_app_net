@@ -1,98 +1,337 @@
 ﻿using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
+using pos_api_app.DTOs.GeneralDTO;
 using pos_api_app.DTOs.ProductDTO;
+using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.Models.Entities;
+using pos_api_app.Utilities;
 
 namespace pos_api_app.Services;
 
 public class ProductService
 {
-    private readonly IProductRepository _productRepository;
-    private readonly PosDbContext _posDbContext;
+	private readonly IProductRepository _productRepository;
+	private readonly IPriceRepository _priceRepository;
+	private readonly IUnitRepository _unitRepository;
+	private readonly PosDbContext _posDbContext;
 
-    public ProductService(IProductRepository productRepository, PosDbContext posDbContext)
-    {
-        _productRepository = productRepository;
-        _posDbContext = posDbContext;
-    }
+	public ProductService(IProductRepository productRepository, IPriceRepository priceRepository, IUnitRepository unitRepository, PosDbContext posDbContext)
+	{
+		_productRepository = productRepository;
+		_priceRepository = priceRepository;
+		_unitRepository = unitRepository;
+		_posDbContext = posDbContext;
+	}
 
-    public IEnumerable<ProductDTO>? Get()
-    {
-        var list = _productRepository.GetAll();
-        if (list == null || !list.Any()) return null;
+	public async Task<ResponseDTO<ResponseTableDTO<GetProductDTO>?>> Get(ProductTableDTO req)
+	{
+		var response = new ResponseDTO<ResponseTableDTO<GetProductDTO>?>();
+		using var transaction = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			var (data, count) = await _productRepository.GetProduct(req);
+			if (data is null || data.Count == 0)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				return response;
+			}
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = new ResponseTableDTO<GetProductDTO> // Initialize Data first
+			{
+				DataTable = data,
+				TotalRecord = count,
+				CurrentPage = req.PageNumber,
+				TotalPage = (int)Math.Ceiling(count / (double)req.RowsPerPage)
+			};
+			return response;
+		}
+		catch
+		{
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
+	}
 
-        var dto=list.Select(product => (ProductDTO)product);
-        return dto;
-    }
+	public async Task<ResponseDTO<List<ProductDTODropdown>?>> GetAllProductPriceDropdown()
+	{
+		var response = new ResponseDTO<List<ProductDTODropdown>?>();
+		var dataDropdown = new List<ProductDTODropdown>();
 
-    public ProductDTO? Get(string barcodeID)
-    {
-        var product = _productRepository.GetByBarcode(barcodeID);
-        if (product == null) return null;
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			dataDropdown = await _productRepository.GetProductPriceDropdown();
+			if (dataDropdown is null || dataDropdown.Count == 0)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				response.Data = null;
+				return response;
+			}
+		}
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		response.Data = dataDropdown;
+		return response;
+	}
 
-        var dto = (ProductDTO)product;
-        return dto;
-    }
+	public async Task<ResponseDTO<ProductDTODropdown?>> GetProductByBarcodeDropdown(string BarcodeId)
+	{
+		var response = new ResponseDTO<ProductDTODropdown?>();
+		var dataDropdown = new ProductDTODropdown();
 
-    public ProductDTO? Get(Guid guid)
-    {
-        var product = _productRepository.GetByGuid(guid);
-        if (product == null) return null;
-        
-        var dto = (ProductDTO)product;
-        return dto;
-    }
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			var dataProduct = await _productRepository.GetByBarcode(BarcodeId);
+			if (dataProduct is null)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				response.Data = null;
+				return response;
+			}
+			dataDropdown = (ProductDTODropdown)dataProduct;
+			await transactions.CommitAsync();
+		}
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		response.Data = dataDropdown;
+		return response;
+	}
 
-    public int Delete(Guid guid)
-    {
-        var getEntity = _productRepository.GetByGuid(guid);
-        if (getEntity == null) return -1;
+	public async Task<ResponseDTO<int?>> DeleteDataProductPrice(int id)
+	{
+		var response = new ResponseDTO<int?>();
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			try
+			{
+				var getPrice = await _priceRepository.GetById(id);
+				if (getPrice is null)
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
+				getPrice.IsDeleted = true;
+				var isSucced = await _priceRepository.Update(getPrice);
+				if (!isSucced)
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
 
-        var delete = _productRepository.Delete(getEntity);
-        if (!delete) return 0;
+				await transactions.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				return response;
 
-        return 1;
-    }
+			}
+			catch (Exception ex)
+			{
+				await transactions.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem + ex.Message + ex.InnerException;
+				return response;
+			}
+		}
+	}
 
-    public int Edit(ProductDTO product)
-    {
-        using(var transaction = _posDbContext.Database.BeginTransaction())
-        {
-            try
-            {
-                var IsExits = _productRepository.IsExits(product.Guid);
-                if(!IsExits) return -1;
+	public async Task<ResponseDTO<bool>> Edit(GetProductDTO req)
+	{
+		var response = new ResponseDTO<bool>();
+		using (var transaction = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			try
+			{
+				// Get Product Id
+				var productData = await _productRepository.GetByBarcode(req.BarcodeId);
+				if (productData is null)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					response.Data = false;
+					return response;
+				}
+				productData.Title = req.Title;
+				productData.BarcodeID = req.BarcodeId;
+				productData.UpdatedTime = DateTime.UtcNow;
+				var isUpdated = await _productRepository.Update(productData);
+				if (!isUpdated)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					response.Data = isUpdated;
+					return response;
+				}
 
-                var edit = _productRepository.Update((Product)product);
-                if(!edit) return 0;
+				// Get Unit Id
+				var unitData = await _unitRepository.GetByName(req.QuantityType);
+				if (unitData is null)
+				{
+					var unit = (Unit)req;
+					unit.CreatedTime = DateTime.UtcNow;
+					unit.IsDeleted = false;
+					unitData = await _unitRepository.Create(unit);
+					if (unitData is null)
+					{
+						await transaction.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
+				}
+				// Update Price 
+				var priceData = await _priceRepository.GetById(req.PriceId);
+				if (priceData is null)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
+				priceData.UnitId = unitData.Id;
+				priceData.ProductId = priceData.Id;
+				priceData.UpdatedTime = DateTime.UtcNow;
+				priceData.Amount = req.Amount;
+				var edit = await _priceRepository.Update(priceData);
+				if (!edit)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					return response;
+				}
 
-                transaction.Commit();
-                return 1;
+				await transaction.CommitAsync();
 
-            }catch
-            {
-                transaction.Rollback();
-                return 0;
-            }
-        }
-    }
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				response.Data = true;
+				return response;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				await transaction.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
+			}
+		}
+	}
 
-    public int Create(NewProductDTO newProductDTO)
-    {
-        using(var transactions = _posDbContext.Database.BeginTransaction())
-        {
-            try
-            {
-                var created = _productRepository.Create((Product)newProductDTO);
-                if (created == null) return 0;
-                transactions.Commit();
-                return 1;
-            }
-            catch
-            {
-                transactions.Rollback();
-                return 1;
-            }
-        }
-    }
+	public async Task<ResponseDTO<bool>> Create(NewProductDTO req)
+	{
+		var response = new ResponseDTO<bool>();
+
+		if (req == null)
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = "Request cannot be null";
+			return response;
+		}
+		// Add at the beginning of the method
+		if (string.IsNullOrWhiteSpace(req.BarcodeID) || string.IsNullOrWhiteSpace(req.QuantityType))
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = "BarcodeID and/or Unit are required";
+			return response;
+		}
+
+		using (var transactions = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			try
+			{
+				var price = (Price)req;
+				//UNIT PROCESS
+				var unitData = await _unitRepository.GetByName(req.QuantityType);
+				if (unitData is null)
+				{
+					var unit = (Unit)req;
+					unit.CreatedTime = DateTime.UtcNow;
+					unit.IsDeleted = false;
+					unitData = await _unitRepository.Create(unit);
+					if (unitData is null)
+					{
+						await transactions.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
+					price.UnitId = unitData.Id;
+				}
+				else
+				{
+					price.UnitId = unitData.Id;
+				}
+				//PRODUCT PROCESS
+				var productData = await _productRepository.GetByBarcode(req.BarcodeID);
+				if (productData is null)
+				{
+					var product = (Product)req;
+					product.CreatedTime = DateTime.UtcNow;
+					product.IsDeleted = false;
+					productData = await _productRepository.Create(product);
+					if (productData is null)
+					{
+						await transactions.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
+					price.ProductId = productData.Id;
+				}
+				else
+				{
+					if (!productData.Title.Equals(req.Title, StringComparison.OrdinalIgnoreCase))
+					{
+						await transactions.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
+					price.ProductId = productData.Id;
+				}
+
+				//PRICE PROCESS
+				if (await _priceRepository.IsPricesExistByProductAndUnitID((decimal)price.ProductId, (decimal)price.UnitId))
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					return response;
+				}
+
+				price.CreatedTime = DateTime.UtcNow;
+				price.IsDeleted = false;
+				var priceData = await _priceRepository.Create(price);
+				if (priceData is null)
+				{
+					await transactions.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = StaticValue.ResponseMessage.ErrorSystem;
+					return response;
+				}
+				await transactions.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				return response;
+			}
+			catch
+			{
+				await transactions.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
+			}
+		}
+	}
 }

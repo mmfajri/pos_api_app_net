@@ -4,14 +4,14 @@ namespace pos_api_app.DTOs.UnitDTO;
 
 public class NewUnitDTO
 {
-    public string Name { get; set; } = string.Empty;
+	public string Name { get; set; } = string.Empty;
 
-    public static explicit operator Unit(NewUnitDTO newUnitDTO)
-    {
-        return new Unit
-        {
-            Guid = Guid.NewGuid(),
-            Name = newUnitDTO.Name,
-        };
-    }
+	public static explicit operator Unit(NewUnitDTO newUnitDTO)
+	{
+		return new Unit
+		{
+			Name = newUnitDTO.Name,
+		};
+	}
+
 }

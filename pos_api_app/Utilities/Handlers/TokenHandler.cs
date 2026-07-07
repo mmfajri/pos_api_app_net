@@ -8,24 +8,24 @@ namespace pos_api_app.Utilities.Handlers;
 
 public class TokenHandler : ITokenHandler
 {
-    private readonly IConfiguration _configuration;
+	private readonly IConfiguration _configuration;
 
-    public TokenHandler(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+	public TokenHandler(IConfiguration configuration)
+	{
+		_configuration = configuration;
+	}
 
-    public string GenerateToken(IEnumerable<Claim> claims)
-    {
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTService:Key"]));
-        var siginCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-        var tokenOptions = new JwtSecurityToken(issuer: _configuration["JWTService:Key"],
-                                                audience: _configuration["JWTService:Key"],
-                                                claims: claims,
-                                                expires: DateTime.Now.AddMinutes(60),
-                                                signingCredentials: siginCredentials);
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-        
-        return tokenString;
-    }
+	public string GenerateToken(IEnumerable<Claim> claims)
+	{
+		var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTService:Key"] ?? string.Empty));
+		var siginCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+		var tokenOptions = new JwtSecurityToken(issuer: _configuration["JWTService:Key"],
+							audience: _configuration["JWTService:Key"],
+							claims: claims,
+							expires: DateTime.Now.AddMinutes(60),
+							signingCredentials: siginCredentials);
+		var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+		return tokenString;
+	}
 }

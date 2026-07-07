@@ -5,5 +5,6 @@ namespace pos_api_app.Contracts.Repositories.Entities;
 
 public interface IAccountRepository : IGeneralRepository<Account>
 {
-    //public bool IsUniqueUsername(string username);
+	Task<bool> IsUniqueUsername(string username);
+	Task<Account?> GetAccountByUsername(string username);
 }

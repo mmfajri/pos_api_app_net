@@ -6,12 +6,12 @@ namespace pos_api_app.Utilities.Validations.TransactionDTO;
 
 public class NewTransactionValidation : AbstractValidator<NewTransactionDTO>
 {
-    public NewTransactionValidation()
-    {
-        RuleFor(attr => attr.TransactionDate).NotEmpty().WithMessage("Transaction Date is required");
-        RuleFor(attr => attr.TotalAmmount)
-        .NotEmpty().WithMessage("TotalAmmount is required")
-        .GreaterThanOrEqualTo(0)
-        .Must(OnlyNumberHandler<decimal>.ValidNumber).WithMessage("TotalAmount should contain only numbers, dots, or commas");
-    }
+	public NewTransactionValidation()
+	{
+		RuleFor(attr => attr.TransactionDate).NotEmpty().WithMessage("Transaction Date is required");
+		RuleFor(attr => attr.TotalAmmount)
+		.NotEmpty().WithMessage("TotalAmmount is required")
+		.GreaterThanOrEqualTo(0)
+		.Must(OnlyNumberHandler<decimal>.ValidNumber).WithMessage("TotalAmount should contain only numbers, dots, or commas");
+	}
 }

@@ -6,9 +6,9 @@ namespace pos_api_app.Models;
 public abstract class BaseEntity
 {
 	[Key]
-	[Column("guid")]
+	[Column("id")]
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-	public Guid Guid { get; set; }
+	public int Id { get; set; }
 	[Column("created_time")]
 	public DateTime? CreatedTime { get; set; }
 	[Column("updated_time")]

@@ -4,18 +4,18 @@ namespace pos_api_app.DTOs.PriceDTO;
 
 public class PriceDTO
 {
-    public Guid Guid { get; set; }
-    public Guid? ProductGuid { get; set; }
-    public Guid? UnitGuid { get; set; }
+    public int Id { get; set; }
+    public int? ProductId { get; set; }
+    public int? UnitId { get; set; }
     public decimal Amount { get; set; }
 
     public static explicit operator PriceDTO(Price price)
     {
         return new PriceDTO
         {
-            Guid = price.Guid,
-            ProductGuid = price.ProductGuid,
-            UnitGuid = price.UnitGuid,
+            Id = price.Id,
+            ProductId = price.ProductId,
+            UnitId = price.UnitId,
             Amount = price.Amount,
         };
     }
@@ -24,7 +24,6 @@ public class PriceDTO
     {
         return new Price
         {
-            Guid = price.Guid,
             Amount = price.Amount
         };
     }

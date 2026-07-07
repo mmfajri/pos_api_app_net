@@ -1,8 +1,7 @@
 ﻿#nullable disable
-using System.Data.Common;
-using pos_api_app.Models.Entities;
 using pos_api_app.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using pos_api_app.Utilities;
 
 namespace pos_api_app.Data;
 
@@ -19,6 +18,19 @@ public class PosDbContext : DbContext
 	public DbSet<TransactionItem> TransactionItems { get; set; }
 	public DbSet<Unit> Units { get; set; }
 
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		if (!optionsBuilder.IsConfigured)
+		{
+#nullable enable
+			string? connectionString = GetConfig.AppSetting["ConnectionStrings:DefaultConnection"];
+
+			if (string.IsNullOrEmpty(connectionString)) return;
+			optionsBuilder.UseNpgsql(connectionString);
+		}
+		base.OnConfiguring(optionsBuilder);
+	}
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
@@ -29,63 +41,94 @@ public class PosDbContext : DbContext
 			emp.UserName
 		}).IsUnique();
 
-		//Set Relationship and Cardinality
+		modelBuilder.Entity<Product>().HasIndex(x => new
+		{
+			x.BarcodeID
+		}).IsUnique();
 
-		//Account to Employee (One to One)
-		// modelBuilder.Entity<Account>()
-		//     .HasOne(account => account.Employee)
-		//     .WithOne(employee => employee.Account)
-		//     .HasForeignKey<Employee>(employee => employee.AccountGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
+		modelBuilder.Entity<Unit>().HasIndex(x => new
+		{
+			x.Name
+		}).IsUnique();
+
+		//Set Relationship and Cardinality
+		// Model
+		modelBuilder.Entity<Account>()
+		    .HasOne(Account => Account.Role)
+		    .WithMany(Role => Role.Accounts)
+		    .HasForeignKey(account => account.RoleId)
+		    .OnDelete(DeleteBehavior.SetNull);
+		modelBuilder.Entity<Account>()
+		    .HasOne(account => account.Employee)
+		    .WithOne(employee => employee.Account)
+		    .HasForeignKey<Employee>(employee => employee.AccountId)
+		    .OnDelete(DeleteBehavior.SetNull);
+		modelBuilder.Entity<Account>()
+			.HasMany(account => account.Transactions)
+			.WithOne(transaction => transaction.Account)
+			.HasForeignKey(transaction => transaction.AccountId)
+			.OnDelete(DeleteBehavior.SetNull);
+
+		// Employee
+		modelBuilder.Entity<Employee>()
+			.HasOne(employee => employee.Account)
+			.WithOne(account => account.Employee)
+			.HasForeignKey<Employee>(employee => employee.AccountId)
+			.OnDelete(DeleteBehavior.SetNull);
+
+		// Price
+		modelBuilder.Entity<Price>()
+			.HasOne(price => price.Product)
+			.WithMany(product => product.Prices)
+			.HasForeignKey(price => price.ProductId)
+			.OnDelete(DeleteBehavior.SetNull);
+		modelBuilder.Entity<Price>()
+			.HasOne(price => price.Unit)
+			.WithMany(unit => unit.Prices)
+			.HasForeignKey(price => price.UnitId)
+			.OnDelete(DeleteBehavior.SetNull);
+
+		// Product
+		modelBuilder.Entity<Product>()
+		    .HasMany(product => product.Prices)
+		    .WithOne(prices => prices.Product)
+		    .HasForeignKey(prices => prices.ProductId)
+		    .OnDelete(DeleteBehavior.SetNull);
+
+		// Role
+		modelBuilder.Entity<Role>()
+			.HasMany(role => role.Accounts)
+			.WithOne(account => account.Role)
+			.HasForeignKey(account => account.RoleId)
+			.OnDelete(DeleteBehavior.SetNull);
+
+		// Transaction
+		// modelBuilder.Entity<Transaction>()
+		// 	.HasMany(transaction => transaction.TransactionItems)
+		// 	.WithOne(transactionItem => transactionItem.Transaction)
+		// 	.HasForeignKey(transactionItem => transactionItem.TransactionId)
+		// 	.OnDelete(DeleteBehavior.SetNull);
 		//
-		//
-		// //Role to Account (One to Many)
-		// modelBuilder.Entity<Role>()
-		//     .HasMany(role => role.Accounts)
-		//     .WithOne(employee => employee.Role)
-		//     .HasForeignKey(employee => employee.RoleGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
-		//
-		// //Product to Prices (One to Many)
-		// modelBuilder.Entity<Product>()
-		//     .HasMany(product => product.Prices)
-		//     .WithOne(prices => prices.Product)
-		//     .HasForeignKey(prices => prices.ProductGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
-		//
-		// //Product to TransactionItem (One to Many)
-		// modelBuilder.Entity<Product>()
-		//     .HasMany(product => product.TransactionItems)
-		//     .WithOne(transactions_items => transactions_items.Product)
-		//     .HasForeignKey(transactions_item => transactions_item.ProductGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
-		//
-		// //Unit to Prices (One to Many)
-		// modelBuilder.Entity<Unit>()
-		//     .HasMany(unit => unit.Prices)
-		//     .WithOne(prices => prices.Unit)
-		//     .HasForeignKey(prices => prices.UnitGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
-		//
-		// //TransactionItem to Transaction (Many to One)
+		modelBuilder.Entity<Transaction>()
+			.HasOne(transaction => transaction.Account)
+			.WithMany(account => account.Transactions)
+			.HasForeignKey(transaction => transaction.AccountId)
+			.OnDelete(DeleteBehavior.SetNull);
+
+		// Transaction Item
 		// modelBuilder.Entity<TransactionItem>()
-		//     .HasOne(transaction_item => transaction_item.Transaction)
+		//     .HasOne(TransactionItem => TransactionItem.Transaction)
 		//     .WithMany(transaction => transaction.TransactionItems)
-		//     .HasForeignKey(transactions_item => transactions_item.TransactionGuid)
+		//     .HasForeignKey(transactions_item => transactions_item.TransactionId)
 		//     .OnDelete(DeleteBehavior.SetNull);
-		//
-		// //TransactionsItem to Product (Many to One)
-		// modelBuilder.Entity<TransactionItem>()
-		//     .HasOne(transaction_item => transaction_item.Product)
-		//     .WithMany(product => product.TransactionItems)
-		//     .HasForeignKey(transaction_item => transaction_item.ProductGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
-		//
-		// //TransactionItem to Price (Many to One)
-		// modelBuilder.Entity<TransactionItem>()
-		//     .HasOne(transaction_item => transaction_item.Price)
-		//     .WithMany(price => price.TransactionItems)
-		//     .HasForeignKey(TransactionItem => TransactionItem.PriceGuid)
-		//     .OnDelete(DeleteBehavior.SetNull);
+
+		//Unit 
+		modelBuilder.Entity<Unit>()
+		    .HasMany(unit => unit.Prices)
+		    .WithOne(prices => prices.Unit)
+		    .HasForeignKey(prices => prices.UnitId)
+		    .OnDelete(DeleteBehavior.SetNull);
+
 	}
+
 }

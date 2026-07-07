@@ -6,17 +6,20 @@ namespace pos_api_app.Models.Entities;
 [Table("tb_tr_transaction")]
 public class Transaction : BaseEntity
 {
-	[Column("employee_guid")]
-	public Guid? EmployeeGuid { get; set; }
+	[Column("account_id")]
+	public int? AccountId { get; set; }
 
 	[Column("transaction_date")]
 	public DateTime TransactionsDate { get; set; }
 
-
-	[Column("total_ammount", TypeName = "decimal(18,2)")]
+	[Column("total_price_amount", TypeName = "decimal(18,2)")]
 	public decimal? TotalAmmount { get; set; }
 
+	[Column("pay_amount", TypeName = "decimal(18,2)")]
+	public decimal? PayAmount { get; set; }
+
 	//Cardinality
-	public ICollection<TransactionItem>? TransactionItems { get; set; }
-	public Employee? Employee { get; set; }
+	public Account? Account { get; set; }
+	//No need Relationship for better performance
+	// public ICollection<TransactionItem>? TransactionItems { get; set; }
 }

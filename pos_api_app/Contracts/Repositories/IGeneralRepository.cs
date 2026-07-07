@@ -1,11 +1,14 @@
-﻿namespace pos_api_app.Contracts.Repositories;
+﻿using pos_api_app.Models;
 
-public interface IGeneralRepository<TEntity>
+namespace pos_api_app.Contracts.Repositories;
+
+public interface IGeneralRepository<TEntity> where TEntity : BaseEntity
 {
 	Task<IEnumerable<TEntity>> GetAll();
-	Task<TEntity?> GetByGuid(Guid guid);
+	Task<TEntity?> GetById(int id);
 	Task<TEntity?> Create(TEntity entity);
+	Task<bool> CreateBulk(List<TEntity> entities);
 	Task<bool> Update(TEntity entity);
 	Task<bool> Delete(TEntity entity);
-	Task<bool> IsExits(Guid guid);
+	Task<bool> IsExits(int id);
 }

@@ -16,10 +16,10 @@ public class RoleService
         _context = context;
     }
 
-    public IEnumerable<RoleDTO>? GetAll()
+    public async Task<IEnumerable<RoleDTO>?> GetAll()
     {
-        var list = _roleService.GetAll();
-        if(list == null || !list.Any()) 
+        var list = await _roleService.GetAll();
+        if (list == null || !list.Any())
         {
             return null;
         }
@@ -28,21 +28,21 @@ public class RoleService
         return listDto;
     }
 
-    public int Create(NewRoleDTO role)
+    public async Task<int> Create(NewRoleDTO role)
     {
         var roleEntity = (Role)role;
-        var create = _roleService.Create(roleEntity);
-        if(create is null) return 0;
+        var create = await _roleService.Create(roleEntity);
+        if (create is null) return 0;
         return 1;
     }
 
-    public int Delete(Guid guid)
+    public async Task<int> Delete(int id)
     {
-        var roleEntity = _roleService.GetByGuid(guid);
+        var roleEntity = await _roleService.GetById(id);
         if (roleEntity == null) return -1;
 
-        var delete = _roleService.Delete(roleEntity);
-        if(delete == false) return 0;
+        var delete = await _roleService.Delete(roleEntity);
+        if (delete == false) return 0;
         return 1;
     }
 }

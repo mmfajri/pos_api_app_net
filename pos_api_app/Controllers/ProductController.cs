@@ -4,6 +4,8 @@ using pos_api_app.Utilities.Handlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Diagnostics.CodeAnalysis;
 
 namespace pos_api_app.Controllers;
 
@@ -19,147 +21,160 @@ public class ProductController : ControllerBase
 	}
 
 	[HttpGet]
-	public IActionResult Get()
+	public async Task<IActionResult> Get([FromQuery] ProductTableDTO req)
 	{
-		var list = _productService.Get();
-		if (list == null) return NotFound(new ResponseHandler<ProductDTO>
+		var response = await _productService.Get(req);
+		switch (response.StatusCode)
 		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data Not Found"
-		});
-
-		return Ok(new ResponseHandler<IEnumerable<ProductDTO>>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Data Found",
-			Data = list
-		});
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
 	}
 
-	[HttpGet("Barcode/{barcodeID}")]
-	public IActionResult Get(string barcodeID)
+	[HttpGet("GetAllProductDropdown")]
+	public async Task<IActionResult> GetAllProductDropdown()
 	{
-		var product = _productService.Get(barcodeID);
-		if (product == null) return NotFound(new ResponseHandler<ProductDTO>
+		var response = await _productService.GetAllProductPriceDropdown();
+		switch (response.StatusCode)
 		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data not found"
-		});
-
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Data Found",
-			Data = product
-		});
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
 	}
 
-	[HttpGet("{guid}/")]
-	public IActionResult Get(Guid guid)
+	[HttpGet("GetProductByBarcodeIdDropdown")]
+	public async Task<IActionResult> GetProductByBarcodeIdDropdown([FromQuery] string barcodeId)
 	{
-		var product = _productService.Get(guid);
-		if (product == null) return NotFound(new ResponseHandler<ProductDTO>
+		var response = await _productService.GetProductByBarcodeDropdown(barcodeId);
+		switch (response.StatusCode)
 		{
-			Code = StatusCodes.Status404NotFound,
-			Status = HttpStatusCode.NotFound.ToString(),
-			Message = "Data not found"
-		});
-
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Data found",
-			Data = product
-		});
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
 	}
 
 	[HttpPost("Create")]
-	public IActionResult Create(NewProductDTO productDTO)
+	public async Task<IActionResult> Create(NewProductDTO productDTO)
 	{
-		var created = _productService.Create(productDTO);
-		if (created == 0) return BadRequest(new ResponseHandler<ProductDTO>
+		var response = await _productService.Create(productDTO);
+		switch (response.StatusCode)
 		{
-			Code = StatusCodes.Status400BadRequest,
-			Status = HttpStatusCode.BadRequest.ToString(),
-			Message = "Bad Connections, Data Failed to Add"
-		});
-
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Successfully Added",
-		});
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
+				{
+					return Unauthorized(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
 	}
 
 	[HttpPut("Update")]
-	public IActionResult Update(ProductDTO productDTO)
+	public async Task<IActionResult> Update(GetProductDTO productDTO)
 	{
-		var isUpdated = _productService.Edit(productDTO);
-		switch (isUpdated)
+		var response = await _productService.Edit(productDTO);
+		switch (response.StatusCode)
 		{
-			case 0:
-				return BadRequest(new ResponseHandler<ProductDTO>
+			case StatusCodes.Status400BadRequest:
 				{
-					Code = StatusCodes.Status400BadRequest,
-					Status = HttpStatusCode.BadRequest.ToString(),
-					Message = "Bad Connections, Data Failed to Update"
-				});
-			case -1:
-				return NotFound(new ResponseHandler<ProductDTO>
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
 				{
-					Code = StatusCodes.Status404NotFound,
-					Status = HttpStatusCode.NotFound.ToString(),
-					Message = "Data that want to update is not found"
-				});
-			case 1:
-				return Ok(new ResponseHandler<ProductDTO>
+					return Unauthorized(response);
+				}
+			case StatusCodes.Status404NotFound:
 				{
-					Code = StatusCodes.Status200OK,
-					Status = HttpStatusCode.OK.ToString(),
-					Message = "Successfully Updated",
-				});
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
 			default:
-				return StatusCode(StatusCodes.Status500InternalServerError, new ResponseHandler<ProductDTO>
 				{
-					Code = StatusCodes.Status500InternalServerError,
-					Status = HttpStatusCode.InternalServerError.ToString(),
-					Message = "Internal Server Error"
-				});
+					return StatusCode(response.StatusCode, response);
+				}
 		}
 	}
 
 	[HttpDelete("Delete")]
-	public IActionResult Delete(Guid guid)
+	public async Task<IActionResult> Delete(int id)
 	{
-		var delete = _productService.Delete(guid);
-		switch (delete)
+		var response = await _productService.DeleteDataProductPrice(id);
+		switch (response.StatusCode)
 		{
-			case -1:
-				return BadRequest(new ResponseHandler<ProductDTO>
+			case StatusCodes.Status400BadRequest:
 				{
-					Code = StatusCodes.Status400BadRequest,
-					Status = HttpStatusCode.BadRequest.ToString(),
-					Message = "Bad Connections, Data Failed to Delete"
-				});
-			case 0:
-				return NotFound(new ResponseHandler<ProductDTO>
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
 				{
-					Code = StatusCodes.Status404NotFound,
-					Status = HttpStatusCode.NotFound.ToString(),
-					Message = "Data that want to delete is not found"
-				});
+					return Unauthorized(response);
+				}
+			case StatusCodes.Status404NotFound:
+				{
+					return NotFound(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
 		}
-		return Ok(new ResponseHandler<ProductDTO>
-		{
-			Code = StatusCodes.Status200OK,
-			Status = HttpStatusCode.OK.ToString(),
-			Message = "Successfully deleted the data",
-		});
 	}
 }

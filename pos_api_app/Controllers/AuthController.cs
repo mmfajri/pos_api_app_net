@@ -1,0 +1,60 @@
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net;
+using pos_api_app.DTOs.AuthDTO;
+using pos_api_app.Services;
+
+namespace pos_api_app.Controllers;
+
+[ApiController]
+[Route("pos_api_app/[controller]")]
+public class AuthController : ControllerBase
+{
+	private readonly AuthService _authService;
+
+	public AuthController(AuthService authService)
+	{
+		_authService = authService;
+	}
+
+	[HttpPost("Register")]
+	public async Task<IActionResult> Register(RegisterDTO req)
+	{
+		var response = await _authService.RegisterUser(req);
+
+		if (response.StatusCode != StatusCodes.Status200OK)
+			return BadRequest(response);
+
+		return Ok(response);
+	}
+
+	[HttpPost("Login")]
+	public async Task<IActionResult> Login(LoginDTO req)
+	{
+		var response = await _authService.Login(req);
+		switch (response.StatusCode)
+		{
+			case StatusCodes.Status400BadRequest:
+				{
+					return BadRequest(response);
+				}
+			case StatusCodes.Status403Forbidden:
+				{
+					return Unauthorized(response);
+				}
+			case StatusCodes.Status200OK:
+				{
+					return Ok(response);
+				}
+			default:
+				{
+					return StatusCode(response.StatusCode, response);
+				}
+		}
+
+	}
+}
+
+
+
+

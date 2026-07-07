@@ -4,6 +4,8 @@ using pos_api_app.Models.Entities;
 using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.DTOs.AuthDTO;
+using pos_api_app.Utilities;
+using System.Net;
 
 namespace pos_api_app.Services;
 
@@ -22,12 +24,83 @@ public class AuthService
 	{
 		var response = new ResponseDTO<bool>();
 
-		// Check if the Username Exist in the database
+		using (var transaction = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			try
+			{
+				// Check if the Username Exist in the database
+				var isUsernameExist = await _accountRepository.IsUniqueUsername(req.Username ?? string.Empty);
+				if (isUsernameExist)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = "Invalid Credential Username";
+					return response;
+				}
 
+				// Save it to the Database
+				var model = (Account)req;
+				model.IsDeleted = false;
+				model.CreatedTime = DateTime.UtcNow;
+				var isSuccess = await _accountRepository.Create(model);
+				if (isSuccess is null)
+				{
+					await transaction.RollbackAsync();
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					response.Message = "Invalid Credential Username";
+					return response;
+				}
 
-		// Save it to the Database
+				await transaction.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				response.Data = true;
+				return response;
+			}
+			catch
+			{
+				await transaction.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				response.Data = false;
+				return response;
+			}
+		}
 
-		return response;
 	}
 
+	public async Task<ResponseDTO<AuthDTO>> Login(LoginDTO req)
+	{
+		var response = new ResponseDTO<AuthDTO>();
+
+		//Validate Request
+		if (string.IsNullOrEmpty(req.Username))
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = "Username is empty";
+			return response;
+		}
+
+		// Get Username
+		var dataUser = await _accountRepository.GetAccountByUsername(req.Username);
+		if (dataUser is null)
+		{
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = StaticValue.ResponseMessage.InvalidCredentialUser;
+			return response;
+		}
+
+		if (!Hashing.ValidatePassword(req.Password!, dataUser.Password!))
+		{
+			response.StatusCode = StatusCodes.Status403Forbidden;
+			response.Message = StaticValue.ResponseMessage.InvalidCredentialUser;
+			return response;
+		}
+
+		// Generate Token JWT (Later ON)
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		return response;
+
+	}
 }

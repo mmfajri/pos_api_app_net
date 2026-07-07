@@ -1,8 +1,11 @@
 ﻿using pos_api_app.Contracts.Repositories.Entities;
 using pos_api_app.Data;
+using pos_api_app.DTOs.GeneralDTO;
+using pos_api_app.DTOs.ResponseDTO;
 using pos_api_app.DTOs.TransactionsDTO;
 using pos_api_app.DTOs.TransactionsItemDTO;
 using pos_api_app.Models.Entities;
+using pos_api_app.Utilities;
 using System.Data;
 using System.Net;
 
@@ -10,225 +13,267 @@ namespace pos_api_app.Services;
 
 public class TransactionService
 {
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly ITransactionItemRepository _transactionItemRepository;
-    private readonly IProductRepository _productRepository;
-    private readonly IPriceRepository _priceRepository;
-    private readonly IEmployeeRepository _employeeRepository;
-    private readonly PosDbContext _posDbContext;
+	private readonly ITransactionRepository _transactionRepository;
+	private readonly ITransactionItemRepository _transactionItemRepository;
+	private readonly IProductRepository _productRepository;
+	private readonly IPriceRepository _priceRepository;
+	private readonly IAccountRepository _accountRepository;
+	private readonly PosDbContext _posDbContext;
 
-    public TransactionService(ITransactionRepository transactionRepository, 
-                              ITransactionItemRepository transactionItemRepository, 
-                              IEmployeeRepository employeeRepository,
-                              IPriceRepository priceRepository,
-                              IProductRepository productRepository,
-                              PosDbContext posDbContext)
-    {
-        _transactionRepository = transactionRepository;
-        _transactionItemRepository = transactionItemRepository;
-        _employeeRepository = employeeRepository;
-        _priceRepository = priceRepository;
-        _productRepository = productRepository;
-        _posDbContext = posDbContext;
-    }
+	public TransactionService(ITransactionRepository transactionRepository,
+	      ITransactionItemRepository transactionItemRepository,
+	      IAccountRepository accountRepository,
+	      IPriceRepository priceRepository,
+	      IProductRepository productRepository,
+	      PosDbContext posDbContext)
+	{
+		_transactionRepository = transactionRepository;
+		_transactionItemRepository = transactionItemRepository;
+		_accountRepository = accountRepository;
+		_priceRepository = priceRepository;
+		_productRepository = productRepository;
+		_posDbContext = posDbContext;
+	}
+	// NOTE: INSERT TRANSACTION 
+	public async Task<ResponseDTO<bool>> Create(NewTransactionDTO req)
+	{
+		var response = new ResponseDTO<bool>();
 
-    public IEnumerable<TransactionDTO>? GetAll()
-    {
-        var transactions = _transactionRepository.GetAll();
-        if (transactions == null) return null;
+		using var trxDb = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			//Map the TransactionDTO to TransactionTable
+			var transaction = (Transaction)req;
+			var dataTransaction = await _transactionRepository.Create(transaction);
+			if (dataTransaction is null)
+			{
+				await trxDb.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				response.Data = false;
+				return response;
+			}
 
-        ICollection<TransactionDTO> transactionDto = new List<TransactionDTO>();
-        foreach (var transaction in transactions) 
-        {
-            transactionDto.Add((TransactionDTO)transaction);
-        }
-        return transactionDto;
-    }
 
-    public TransactionDTO? GetDetailTransaction(Guid guid)
-    {
-        var getTransaction = _transactionRepository.GetByGuid(guid);
-        if (getTransaction == null) return null;
-        var transactionDto = (TransactionDTO)getTransaction;
+			if (req.TransactionItemDTOs is not null)
+			{
+				//Mapping the TransactionItemDto to TransactionItemTable
+				foreach (var item in req.TransactionItemDTOs)
+				{
+					var itemTransaction = (TransactionItem)item;
+					itemTransaction.TransactionId = dataTransaction.Id;
+					var dataItemTransaction = _transactionItemRepository.Create(itemTransaction);
+					if (dataItemTransaction is null)
+					{
+						await trxDb.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						response.Data = false;
+						return response;
+					}
+				}
+			}
+			await trxDb.CommitAsync();
 
-        var TransactionItems = _transactionItemRepository.GetByTransactionsGuid(transactionDto.Guid);
-        if (TransactionItems != null)
-        {
-            foreach(var transactionItem in TransactionItems)
-            {
-                transactionDto.TransactionItemsDTO!.Add((TransactionItemDTO)transactionItem);
-            }
-        }
-        return transactionDto;
-    }
+		}
+		catch (Exception ex)
+		{
+			await trxDb.RollbackAsync();
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem + $" {ex}";
+			return response;
+		}
+		return response;
+	}
 
-    public TransactionDTO? Create(NewTransactionDTO transactionDTO)
-    {
-        using(var transactionContext = _posDbContext.Database.BeginTransaction()) 
-        {
-            try
-            {
-                //check if the Employee is exist
-                var isExistEmployee = _employeeRepository.IsExits((Guid)transactionDTO.EmployeeGuid!);
-                if (!isExistEmployee)
-                {
-                    return null;
-                }
+	public async Task<ResponseDTO<ResponseTableDTO<TransactionItemDTO>>> GetDetailTransaction(long id)
+	{
+		var response = new ResponseDTO<ResponseTableDTO<TransactionItemDTO>>();
+		var data = new ResponseTableDTO<TransactionItemDTO>();
 
-                //insert the Transaction Detail to DB
-                var transaction = _transactionRepository.Create((Transaction)transactionDTO);
-                if(transaction == null)
-                {
-                    transactionContext.Rollback();
-                    return null;
-                }
+		using var trxContext = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			var transactionItemList = await _transactionItemRepository.GetByTransactionsId((int)id);
+			if (transactionItemList is null || transactionItemList.Count() == 0)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				return response;
+			}
 
-                //insert the List of Transaction Item to DB
-                foreach(var transactionItem in transactionDTO.TransactionItemDTOs!)
-                {
-                    try
-                    {
-                        //checking the existing Price and Product 
-                        if(!_productRepository.IsExits((Guid)transactionItem.ProductGuid!))
-                        {
-                            return null;
-                        }
-                        if(!_priceRepository.IsExits((Guid)transactionItem.PriceGuid!))
-                        {
-                            return null;
-                        }
+			foreach (var item in transactionItemList)
+			{
+				if (item is not null)
+				{
+					var itemDto = (TransactionItemDTO)item;
+					data.DataTable!.Add(itemDto);
+				}
+			}
+			data.CurrentPage = 1;
+			data.TotalRecord = transactionItemList.Count();
+			data.TotalPage = 1;
 
-                        var createdItem = (TransactionItem) transactionItem;
-                        createdItem.TransactionGuid = transaction.Guid;
-                        var resultTransactionItem = _transactionItemRepository.Create(createdItem);
-                        if (resultTransactionItem == null)
-                        {
-                            transactionContext.Rollback();
-                            return null;
-                        };
-                    }catch
-                    {
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = data;
+			return response;
+		}
+		catch
+		{
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
+	}
 
-                    }
-                }
-                transactionContext.Commit();
-                var dto = (TransactionDTO) transaction;
-                return dto;
-            }
-            catch
-            {
-                transactionContext.Rollback();
-                return null;
-            }
-        }
-    }
-    public int Edit(TransactionDTO transactionDTO)
-    {
-        using(var transactionContext = _posDbContext.Database.BeginTransaction())
-        {
-            try
-            {
-                var isExist = _transactionRepository.IsExits(transactionDTO.Guid);
-                if (!isExist) return (int)HttpStatusCode.NotFound;
+	public async Task<ResponseDTO<ResponseTableDTO<TransactionDTO>>> GetAll(GetTransactionDTO req)
+	{
+		var response = new ResponseDTO<ResponseTableDTO<TransactionDTO>>();
+		var data = new ResponseTableDTO<TransactionDTO>();
+		using var trxContext = await _posDbContext.Database.BeginTransactionAsync();
 
-                //Edit The Transactions
-                var editedTransactions = _transactionRepository.Update((Transaction)transactionDTO);
-                if(editedTransactions == false)
-                {
-                    transactionContext.Rollback();
-                    return (int)HttpStatusCode.BadRequest;
-                }
+		var (transactions, count) = await _transactionRepository.GetListPaginated(req);
+		if (transactions == null)
+		{
+			await trxContext.RollbackAsync();
+			response.StatusCode = StatusCodes.Status400BadRequest;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem;
+			return response;
+		}
+		data.TotalRecord = count;
+		data.DataTable = (List<TransactionDTO>?)transactions;
+		data.CurrentPage = req.PageNumber;
+		data.TotalPage = (int)Math.Ceiling(count / (double)req.RowsPerPage);
 
-                //Edit the TransactionsItem
-                var getAllTransactionItems = _transactionItemRepository.GetByTransactionsGuid(transactionDTO.Guid);
-                if(getAllTransactionItems == null)
-                {
-                    foreach(var transactionsItem in transactionDTO.TransactionItemsDTO!)
-                    {
-                        var createTransactionsItem = _transactionItemRepository.Create((TransactionItem)transactionsItem);
-                        if(createTransactionsItem == null)
-                        {
-                            transactionContext.Rollback();
-                            return (int)HttpStatusCode.BadRequest;
-                        }
-                    }
-                }
-                else
-                {
-                    //Delete Existing Transactions Item
-                    foreach(var transactionItem in getAllTransactionItems)
-                    {
-                        var deleteTransactionsItem = _transactionItemRepository.Delete(transactionItem);
-                        if(deleteTransactionsItem == false)
-                        {
-                            transactionContext.Rollback();
-                            return (int)HttpStatusCode.BadRequest;
-                        }
-                    }
-                    //Create New TransactionItem on the Transaction
-                    foreach(var transactionItem in transactionDTO.TransactionItemsDTO!)
-                    {
-                        var createTransactionItem = _transactionItemRepository.Create((TransactionItem)transactionItem);
-                        if (createTransactionItem == null)
-                        {
-                            transactionContext.Rollback();
-                            return (int)HttpStatusCode.BadRequest;
-                        }
-                    }
-                }
-                transactionContext.Commit();
-                return (int)HttpStatusCode.OK;
-            }
-            catch
-            {
-                transactionContext.Rollback();
-                return (int)HttpStatusCode.BadRequest;
-            }
-        }
-    }
 
-    public int Delete(Guid guid)
-    {
-        using(var transactionContext = _posDbContext.Database.BeginTransaction())
-        {
-            try
-            {
-                //Check Existing Transactions
-                var isExist = _transactionRepository.IsExits(guid);
-                if (isExist == false) return (int)HttpStatusCode.NotFound;
-                var getTransaction = _transactionRepository.GetByGuid(guid)!;
+		await trxContext.CommitAsync();
+		response.StatusCode = StatusCodes.Status200OK;
+		response.Message = StaticValue.ResponseMessage.Success;
+		response.Data = data;
+		return response;
+	}
 
-                //Delete TransactionsItem
-                if (getTransaction.TransactionItems != null)
-                {
-                    var getTransactionItem = _transactionItemRepository.GetByTransactionsGuid(guid)!;
-                    foreach(var transactionItem in getTransactionItem)
-                    {
-                        var deleteTransactionItem = _transactionItemRepository.Delete(transactionItem);
-                        if (!deleteTransactionItem)
-                        {
-                            transactionContext.Rollback();
-                            return (int)HttpStatusCode.BadRequest;
-                        }
-                    }
-                }
+	public async Task<ResponseDTO<bool>> UpdateTransactionItems(UpdateTransactionItemDTO req)
+	{
+		var response = new ResponseDTO<bool>();
 
-                //Delete Transaction
-                var deleteTransaction = _transactionRepository.Delete(getTransaction);
-                if (!deleteTransaction)
-                {
-                    transactionContext.Rollback();
-                    return (int)HttpStatusCode.BadRequest;
-                }
+		using var trxDb = await _posDbContext.Database.BeginTransactionAsync();
+		try
+		{
+			// Check if transaction exists
+			var isExist = await _transactionRepository.IsExits(req.TransactionId);
+			if (!isExist)
+			{
+				response.StatusCode = StatusCodes.Status404NotFound;
+				response.Message = StaticValue.ResponseMessage.DataNotFound;
+				response.Data = false;
+				return response;
+			}
 
-                transactionContext.Commit();
-                return (int)HttpStatusCode.OK;
-            } 
-            catch
-            {
-                transactionContext.Rollback();
-                return (int)HttpStatusCode.BadRequest;
-            }
-        }
-    }
+			// Force delete all existing transaction items for this transaction
+			var deleteResult = await _transactionItemRepository.DeleteByTransactionId(req.TransactionId);
+			if (!deleteResult)
+			{
+				await trxDb.RollbackAsync();
+				response.StatusCode = StatusCodes.Status400BadRequest;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				response.Data = false;
+				return response;
+			}
+
+			// Add new transaction items from request
+			if (req.ListTransactionItem is not null)
+			{
+				foreach (var item in req.ListTransactionItem)
+				{
+					var transactionItem = (TransactionItem)item;
+					transactionItem.TransactionId = req.TransactionId;
+					var created = _transactionItemRepository.Create(transactionItem);
+					if (created is null)
+					{
+						await trxDb.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						response.Data = false;
+						return response;
+					}
+				}
+			}
+
+			await trxDb.CommitAsync();
+			response.StatusCode = StatusCodes.Status200OK;
+			response.Message = StaticValue.ResponseMessage.Success;
+			response.Data = true;
+		}
+		catch (Exception ex)
+		{
+			await trxDb.RollbackAsync();
+			response.StatusCode = StatusCodes.Status500InternalServerError;
+			response.Message = StaticValue.ResponseMessage.ErrorSystem + $" {ex}";
+			response.Data = false;
+		}
+		return response;
+	}
+
+	public async Task<ResponseDTO<bool>> Delete(int id)
+	{
+
+		var response = new ResponseDTO<bool>();
+		using (var transactionContext = await _posDbContext.Database.BeginTransactionAsync())
+		{
+			try
+			{
+				//Check Existing Transactions
+				var isExist = await _transactionRepository.IsExits(id);
+				if (isExist == false)
+				{
+					response.StatusCode = StatusCodes.Status404NotFound;
+					response.Message = StaticValue.ResponseMessage.DataNotFound;
+					return response;
+				}
+				var getTransaction = await _transactionRepository.GetById(id)!;
+
+				//Delete TransactionsItem
+				if (getTransaction is not null)
+				{
+					var getTransactionItem = await _transactionItemRepository.GetByTransactionsId(id);
+					if (getTransactionItem is not null)
+					{
+						foreach (var item in getTransactionItem)
+						{
+							var deleteTransactionItem = await _transactionItemRepository.Delete(item);
+							if (!deleteTransactionItem)
+							{
+								await transactionContext.RollbackAsync();
+								response.StatusCode = StatusCodes.Status400BadRequest;
+								response.Message = StaticValue.ResponseMessage.ErrorSystem;
+								return response;
+							}
+						}
+					}
+					//Delete Transaction
+					var deleteTransaction = await _transactionRepository.Delete(getTransaction);
+					if (!deleteTransaction)
+					{
+						await transactionContext.RollbackAsync();
+						response.StatusCode = StatusCodes.Status400BadRequest;
+						response.Message = StaticValue.ResponseMessage.ErrorSystem;
+						return response;
+					}
+				}
+				await transactionContext.CommitAsync();
+				response.StatusCode = StatusCodes.Status200OK;
+				response.Message = StaticValue.ResponseMessage.Success;
+				return response;
+			}
+			catch
+			{
+				await transactionContext.RollbackAsync();
+				response.StatusCode = StatusCodes.Status500InternalServerError;
+				response.Message = StaticValue.ResponseMessage.ErrorSystem;
+				return response;
+			}
+		}
+	}
 }

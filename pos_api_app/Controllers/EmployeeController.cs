@@ -19,9 +19,9 @@ public class EmployeeController : ControllerBase
 	}
 
 	[HttpGet]
-	public IActionResult GetEmployee()
+	public async Task<IActionResult> GetEmployee()
 	{
-		var listEmployee = _employeeService.Get();
+		var listEmployee = await _employeeService.Get();
 		if (listEmployee == null) return NotFound(
 		    new ResponseHandler<EmployeeDTO>
 		    {
@@ -39,10 +39,10 @@ public class EmployeeController : ControllerBase
 		});
 	}
 
-	[HttpGet("{guid}/")]
-	public IActionResult GetEmployee(Guid guid)
+	[HttpGet("{id}/")]
+	public async Task<IActionResult> GetEmployee(int id)
 	{
-		var employee = _employeeService.Get(guid);
+		var employee = await _employeeService.Get(id);
 		if (employee == null) return NotFound(
 		    new ResponseHandler<EmployeeDTO>
 		    {
@@ -60,9 +60,9 @@ public class EmployeeController : ControllerBase
 	}
 
 	[HttpPost("AddEmployee/")]
-	public IActionResult AddEmployee(NewEmployeeDTO newEmployeeDTO)
+	public async Task<IActionResult> AddEmployee(NewEmployeeDTO newEmployeeDTO)
 	{
-		var created = _employeeService.Create(newEmployeeDTO);
+		var created = await _employeeService.Create(newEmployeeDTO);
 		if (created != null)
 		{
 			return Ok(new ResponseHandler<EmployeeDTO>
@@ -83,9 +83,9 @@ public class EmployeeController : ControllerBase
 	}
 
 	[HttpPut("UpdatePrice/")]
-	public IActionResult UpdateEmployee(EmployeeDTO EmployeeDTO)
+	public async Task<IActionResult> UpdateEmployee(EmployeeDTO EmployeeDTO)
 	{
-		var update = _employeeService.Edit(EmployeeDTO);
+		var update = await _employeeService.Edit(EmployeeDTO);
 		if (!update)
 		{
 			return BadRequest(new ResponseHandler<EmployeeDTO>
@@ -104,10 +104,10 @@ public class EmployeeController : ControllerBase
 		});
 	}
 
-	[HttpDelete("Delete/{guid}")]
-	public IActionResult DeleteEmployee(Guid guid)
+	[HttpDelete("Delete/{id}")]
+	public async Task<IActionResult> DeleteEmployee(int id)
 	{
-		var delete = _employeeService.Delete(guid);
+		var delete = await _employeeService.Delete(id);
 		switch (delete)
 		{
 			case -1:

@@ -4,26 +4,34 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pos_api_app.Models.Entities;
 
-[Table("tb_m_transaction_item")]
+[Table("tb_tr_transaction_item")]
 public class TransactionItem : BaseEntity
 {
-	[Column("transaction_guid")]
-	public Guid? TransactionGuid { get; set; }
+	[Column("transaction_id")]
+	public int? TransactionId { get; set; }
 
-	[Column("product_guid")]
-	public Guid? ProductGuid { get; set; }
+	[Column("barcode_id", TypeName = "varchar(255)")]
+	public string? BarcodeId { get; set; }
 
-	[Column("price_guid")]
-	public Guid? PriceGuid { get; set; }
+	[Column("title_product", TypeName = "varchar(255)")]
+	public string? TitleProduct { get; set; }
+
+	[Column("quantity_type", TypeName = "varchar(200)")]
+	public string? QuantityType { get; set; }
 
 	[Column("quantity")]
-	public float Quantity { get; set; }
+	public decimal? Quantity { get; set; }
 
-	[Column("subtotal", TypeName = "decimal(18,2)")]
-	public decimal Subtotal { get; set; }
+	[Column("price_product", TypeName = "decimal(18,2)")]
+	public decimal? PriceProduct { get; set; }
 
+	[Column("total_price_product", TypeName = "decimal(18,2)")]
+	public decimal? TotalPrice { get; set; }
+
+	// [Column("unit_List", TypeName = "varchar(255)")]
+	// public string? UnitList { get; set; }
+
+	//No Need for fastes performance
 	//Cardinality
-	public Transaction? Transaction { get; set; }
-	public Product? Product { get; set; }
-	public Price? Price { get; set; }
+	// public Transaction? Transaction { get; set; }
 }

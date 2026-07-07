@@ -6,19 +6,20 @@ namespace pos_api_app.DTOs.TransactionsDTO;
 
 public class NewTransactionDTO
 {
-    public Guid? EmployeeGuid { get; set; }
-    public DateTime TransactionDate { get; set; }
-    public decimal TotalAmmount { get; set; }
-    public IEnumerable<NewTransactionItemDTO>? TransactionItemDTOs { get; set; }
+	public int? AccountId { get; set; }
+	public DateTime TransactionDate { get; set; }
+	public decimal TotalAmmount { get; set; }
+	public decimal PayAmount { get; set; }
+	public IEnumerable<NewTransactionItemDTO>? TransactionItemDTOs { get; set; }
 
-    public static explicit operator Transaction(NewTransactionDTO newTransactionDTO)
-    {
-        return new Transaction
-        {
-            Guid = Guid.NewGuid(),
-            EmployeeGuid = newTransactionDTO.EmployeeGuid,
-            TransactionsDate = newTransactionDTO.TransactionDate,
-            TotalAmmount = newTransactionDTO.TotalAmmount,
-        };
-    }
+	public static explicit operator Transaction(NewTransactionDTO newTransactionDTO)
+	{
+		return new Transaction
+		{
+			AccountId = newTransactionDTO.AccountId,
+			TransactionsDate = newTransactionDTO.TransactionDate,
+			TotalAmmount = newTransactionDTO.TotalAmmount,
+			PayAmount = newTransactionDTO.PayAmount,
+		};
+	}
 }
