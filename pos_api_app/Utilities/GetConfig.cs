@@ -9,7 +9,9 @@ public class GetConfig
 	{
 		AppSetting = new ConfigurationBuilder()
 		    .SetBasePath(AppContext.BaseDirectory)
-		    .AddJsonFile("appsettings.json")
+		    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+		    .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true)
+		    .AddEnvironmentVariables()
 		    .Build();
 	}
 }
