@@ -28,8 +28,8 @@ public class TransactionItem : BaseEntity
 	[Column("total_price_product", TypeName = "decimal(18,2)")]
 	public decimal? TotalPrice { get; set; }
 
-	[Column("unit_List", TypeName = "varchar(255)")]
-	public string? UnitList { get; set; }
+	// [Column("unit_List", TypeName = "varchar(255)")]
+	// public string? UnitList { get; set; }
 
 	//No Need for fastes performance
 	//Cardinality

@@ -10,7 +10,6 @@ public class CreateInvoiceTransactionItem
 	public int? Quantity { get; set; }
 	public decimal? Price { get; set; }
 	public decimal? TotalPrice { get; set; }
-	public string UnitList { get; set; } = string.Empty;
 
 	public static explicit operator TransactionItem(CreateInvoiceTransactionItem model)
 	{
@@ -22,7 +21,6 @@ public class CreateInvoiceTransactionItem
 			Quantity = model.Quantity,
 			PriceProduct = model.Price,
 			TotalPrice = model.TotalPrice,
-			UnitList = model.UnitList,
 		};
 	}
 }

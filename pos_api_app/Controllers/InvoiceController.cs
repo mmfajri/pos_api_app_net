@@ -19,6 +19,7 @@ public class InvoiceController : ControllerBase
 	public async Task<IActionResult> SaveInvoiceTransaction(CreateInvoiceTransaction req)
 	{
 		var response = await _invoiceService.SaveInvoiceTransaction(req);
+
 		switch (response.StatusCode)
 		{
 			case StatusCodes.Status400BadRequest:
